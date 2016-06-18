@@ -30,6 +30,7 @@ double ExprAST::eval() {
 }
 
 double NumberExprAST::eval() {
+    std::cout<<mValue<<std::endl;
     return mValue;
 }
 
@@ -50,6 +51,14 @@ double BinaryExprAST::eval() {
         }
         case '/': {
             result = LHS->eval() / RHS->eval();
+            break;
+        }
+        case ',': {
+            result = LHS->eval() , RHS->eval();
+            break;
+        }
+        default: {
+            std::cout<<"Unknown BinaryExprAST opr: "<<mOpr<<std::endl;
             break;
         }
     }

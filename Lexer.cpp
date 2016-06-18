@@ -46,38 +46,6 @@ Token Lexer::lexToken() {
         return Token::NUMBER;
     }
     switch (curChar) {
-        // semicolon
-        // def: ';'
-        case ';': {
-            tokens.push_back(std::make_pair(Token::LABEL_SEMICOLON, ";"));
-            return Token::LABEL_SEMICOLON;
-        }
-        // comma
-        // def: ','
-        case ',': {
-            tokens.push_back(std::make_pair(Token::LABEL_COMMA, ","));
-            return Token::LABEL_COMMA;
-        }
-        // paren
-        // def: '(' or ')'
-        case '(': {
-            tokens.push_back(std::make_pair(Token::LABEL_L_PAREN, "("));
-            return Token::LABEL_L_PAREN;
-        }
-        case ')': {
-            tokens.push_back(std::make_pair(Token::LABEL_R_PAREN, ")"));
-            return Token::LABEL_R_PAREN;
-        }
-        // brace
-        // def: '{' or '}'
-        case '{': {
-            tokens.push_back(std::make_pair(Token::LABEL_L_BRACE, "{"));
-            return Token::LABEL_L_BRACE;
-        }
-        case '}': {
-            tokens.push_back(std::make_pair(Token::LABEL_R_BRACE, "}"));
-            return Token::LABEL_R_BRACE;
-        }
         // end of line
         case '\n': {
             tokens.push_back(std::make_pair(Token::END_OF_LINE, "\\n"));
@@ -102,7 +70,20 @@ Token Lexer::lexToken() {
                     return Token::END_OF_FILE;
                 }
             }
-            // if not '//', jump to default
+            // if not '//', jump to operator
+        }
+        // operator: +-*/(){},;
+        case ';': 
+        case ',': 
+        case '+': 
+        case '-': 
+        case '*': 
+        case '(': 
+        case ')': 
+        case '{': 
+        case '}': {
+            tokens.push_back(std::make_pair(Token::OPERATOR, std::string(1, curChar)));
+            return Token::OPERATOR;
         }
         // unknown
         default: {

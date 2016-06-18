@@ -9,12 +9,7 @@ enum class Token : int {
     END_OF_FILE, 
     IDENTIFIER, 
     NUMBER, 
-    LABEL_COMMA,        // ,
-    LABEL_SEMICOLON,    // ;
-    LABEL_L_PAREN,      // () 
-    LABEL_R_PAREN,  
-    LABEL_L_BRACE,      // {}
-    LABEL_R_BRACE, 
+    OPERATOR,           // operator: +-*/(){},;
     KEYWORD_INT,        // int
     KEYWORD_RET,        // return
 };

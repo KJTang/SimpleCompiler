@@ -19,26 +19,17 @@ private:
 
     // operators(+ - / *) precedence
     std::map<char, int> BinaryOperatorPrecedence = {
-        // {'<', 1}, 
-        {'+', 20}, 
-        {'-', 20}, 
-        {'*', 40}, 
-        {'/', 40}
+        {',', 0},
+        {'<', 1}, 
+        {'>', 1}, 
+        {'+', 2}, 
+        {'-', 2}, 
+        {'*', 3}, 
+        {'/', 3},
     };
     int getOperatorPrecedence(char c) {
         return BinaryOperatorPrecedence[c];
     }
-    // int getOperatorPrecedence() {
-    //     if (!isascii(curToken.second[0])) {
-    //         return -1;
-    //     }
-    //     // Make sure it's a declared binop.
-    //     int oprPrec = BinaryOperatorPrecedence[curToken.second[0]];
-    //     if (oprPrec <= 0) {
-    //         return -1;
-    //     }
-    //     return oprPrec;
-    // }
 public:
     Parser(const std::vector<std::pair<Token, std::string>> &tokens) : mTokens(tokens) {}
     ~Parser() {
@@ -49,20 +40,17 @@ public:
     
     bool parse();
 
-    // PrimaryExpr ::= <NumberExpr> | <ParenExpr> | <IdentifierExpr>
-    ExprAST *parsePrimary();
     // NumberExpr
     ExprAST *parseNumberExpr();
     // ParenExpr ::= "(" <Expression> ")"
     ExprAST *parseParenExpr();
-    // IdentifierExpr ::= variable name or function
+    // IdentifierExpr ::= variable name or function name
     ExprAST *parseIdentifierExpr();
     
-    // Expression ::= <PrimaryExpr> {<operator> <PrimaryExpr>}
+    // Expression ::= { <NumberExpr|IdentifierExpr> {<operator> <NumberExpr|IdentifierExpr>} }
     ExprAST *parseExpression();
-    ExprAST *parseBinaryOperatorRHS(int exprPrec, ExprAST *LHS);
 
+    // test
     void print();
-
     std::string getAsmCode();
 };
