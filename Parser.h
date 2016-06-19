@@ -8,7 +8,7 @@
 class Parser {
 private:
     std::vector<std::pair<Token, std::string>> mTokens;
-    std::vector<ExprAST*> ASTList;
+    std::vector<ASTNode*> ASTList;
     std::string asmcode;
 
     std::pair<Token, std::string> curToken;
@@ -40,15 +40,18 @@ public:
     
     bool parse();
 
-    // NumberExpr
-    ExprAST *parseNumberExpr();
-    // ParenExpr ::= "(" <Expression> ")"
-    ExprAST *parseParenExpr();
-    // IdentifierExpr ::= variable name or function name
-    ExprAST *parseIdentifierExpr();
-    
-    // Expression ::= { <NumberExpr|IdentifierExpr> {<operator> <NumberExpr|IdentifierExpr>} }
-    ExprAST *parseExpression();
+    // <Number>
+    ASTNode *parseNumber();
+    // <Identifier> ::= variable name or function name
+    ASTNode *parseIdentifier();
+    // <ParenExpr> ::= "(" <Expression> ")"
+    ASTNode *parseParenExpr();
+    // <Expression> ::= { <Number|Identifier> {<Operator> <Number|Identifier>} }
+    ASTNode *parseExpression();
+    // <Block> ::= "{" {<Expression> ";"} "}"
+    ASTNode *parseBlock();
+    // <IfExpr> ::= "if" <ParenExpr> <Block>
+    ASTNode *parseIfExpr();
 
     // test
     void print();

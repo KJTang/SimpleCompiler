@@ -23,7 +23,7 @@ bool Parser::parse() {
                 break;
             }
             default: {
-                ExprAST *newExpr = this->parseExpression();
+                ASTNode *newExpr = this->parseExpression();
                 if (newExpr) {
                     ASTList.push_back(newExpr);
                 }
@@ -34,15 +34,15 @@ bool Parser::parse() {
     return true;
 }
 
-ExprAST *Parser::parseNumberExpr() {
-    ExprAST *result = new NumberExprAST(strtod(curToken.second.c_str(), nullptr));
+ASTNode *Parser::parseNumber() {
+    ASTNode *result = new NumberExprAST(strtod(curToken.second.c_str(), nullptr));
     getNextToken();
     return result;
 }
 
-ExprAST *Parser::parseParenExpr() {
+ASTNode *Parser::parseParenExpr() {
     getNextToken();  // eat '('
-    ExprAST *expr = parseExpression();
+    ASTNode *expr = parseExpression();
     if (curToken.first != Token::OPERATOR || curToken.second[0] != ')') {
         std::cout<<"expected \')\'"<<std::endl;
     }
@@ -50,7 +50,7 @@ ExprAST *Parser::parseParenExpr() {
     return expr;
 }
 
-ExprAST *Parser::parseIdentifierExpr() {
+ASTNode *Parser::parseIdentifier() {
     std::string identifier = curToken.second;
     getNextToken();
     // variable name
@@ -60,9 +60,9 @@ ExprAST *Parser::parseIdentifierExpr() {
     return nullptr;
     // // function
     // getNextToken();
-    // std::vector<ExprAST*> args;
+    // std::vector<ASTNode*> args;
     // while (true) {
-    //     ExprAST *arg = parseExpression();
+    //     ASTNode *arg = parseExpression();
     //     if (!arg) {
     //         return nullptr;
     //     }
@@ -77,14 +77,19 @@ ExprAST *Parser::parseIdentifierExpr() {
     // }
 }
 
-ExprAST *Parser::parseExpression() {
-    std::stack<ExprAST*> numStack;
+ASTNode *Parser::parseExpression() {
+    std::stack<ASTNode*> numStack;
     std::stack<char> opStack;
     while (true) {
         switch (curToken.first) {
             case Token::NUMBER: {
                 // std::cout<<"number"<<std::endl;
-                numStack.push(this->parseNumberExpr());
+                numStack.push(this->parseNumber());
+                break;
+            }
+            case Token::IDENTIFIER: {
+                // std::cout<<"identifier"<<std::endl;
+                numStack.push(this->parseIdentifier());
                 break;
             }
             case Token::OPERATOR: {
@@ -105,7 +110,7 @@ ExprAST *Parser::parseExpression() {
                     while (!opStack.empty()) {
                         char op = opStack.top();
                         opStack.pop();
-                        ExprAST *l, *r;
+                        ASTNode *l, *r;
                         r = numStack.top();
                         numStack.pop();
                         l = numStack.top();
@@ -128,7 +133,7 @@ ExprAST *Parser::parseExpression() {
                     getOperatorPrecedence(opStack.top()) >= getOperatorPrecedence(curToken.second[0])) {
                     char op = opStack.top();
                     opStack.pop();
-                    ExprAST *l, *r;
+                    ASTNode *l, *r;
                     r = numStack.top();
                     numStack.pop();
                     l = numStack.top();

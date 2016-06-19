@@ -3,16 +3,16 @@
 #include <string>
 #include <vector>
 
-/// ExprAST - Base class for all expression nodes.
-class ExprAST {
+/// ASTNode - Base class for all expression nodes.
+class ASTNode {
 public:
-    virtual ~ExprAST() {}
+    virtual ~ASTNode() {}
     virtual void print();
     virtual double eval();
 };
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
-class NumberExprAST : public ExprAST {
+class NumberExprAST : public ASTNode {
 private:
     double mValue;
 public:
@@ -22,33 +22,38 @@ public:
 };
 
 /// VariableExprAST - Expression class for referencing a variable, like "a".
-class VariableExprAST : public ExprAST {
+class VariableExprAST : public ASTNode {
 private:
     std::string mName;
 public:
     VariableExprAST(const std::string &name) : mName(name) {}
     virtual void print();
+    virtual double eval();
 };
 
 /// BinaryExprAST - Expression class for a binary operator.
-class BinaryExprAST : public ExprAST {
+class BinaryExprAST : public ASTNode {
 private:
     char mOpr;
-    ExprAST *LHS, *RHS;
+    ASTNode *LHS, *RHS;
 public:
-    BinaryExprAST(char opr, ExprAST *lhs, ExprAST *rhs)
+    BinaryExprAST(char opr, ASTNode *lhs, ASTNode *rhs)
         : mOpr(opr), LHS(lhs), RHS(rhs) {}
+    ~BinaryExprAST() {
+        delete LHS;
+        delete RHS;
+    }
     virtual void print();
     virtual double eval();
 };
 
 /// CallExprAST - Expression class for function calls.
-class CallExprAST : public ExprAST {
+class CallExprAST : public ASTNode {
 private:
     std::string mCallee;
-    std::vector<ExprAST*> mArgs;
+    std::vector<ASTNode*> mArgs;
 public:
-    CallExprAST(const std::string &callee, std::vector<ExprAST*> &args)
+    CallExprAST(const std::string &callee, std::vector<ASTNode*> &args)
         : mCallee(callee), mArgs(args) {}
     virtual void print();
 };
@@ -70,9 +75,9 @@ public:
 class FunctionAST {
 private:
     PrototypeAST *mProto;
-    ExprAST *mBody;
+    ASTNode *mBody;
 public:
-    FunctionAST(PrototypeAST *proto, ExprAST *body)
+    FunctionAST(PrototypeAST *proto, ASTNode *body)
         : mProto(proto), mBody(body) {}
 
 };

@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void ExprAST::print() {
+void ASTNode::print() {
     //
 }
 
@@ -24,14 +24,18 @@ void CallExprAST::print() {
     std::cout<<"call: "<<mCallee<<std::endl;
 }
 
-
-double ExprAST::eval() {
+double ASTNode::eval() {
     return 0;
 }
 
 double NumberExprAST::eval() {
     std::cout<<mValue<<std::endl;
     return mValue;
+}
+
+double VariableExprAST::eval() {
+    std::cout<<mName<<std::endl;
+    return 0;
 }
 
 double BinaryExprAST::eval() {
