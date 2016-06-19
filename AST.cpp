@@ -6,11 +6,11 @@ void ASTNode::print() {
     //
 }
 
-void NumberExprAST::print() {
+void NumberAST::print() {
     std::cout<<"number: "<<mValue<<std::endl;
 }
 
-void VariableExprAST::print() {
+void VariableAST::print() {
     std::cout<<"var: "<<mName<<std::endl;
 }
 
@@ -28,12 +28,12 @@ double ASTNode::eval() {
     return 0;
 }
 
-double NumberExprAST::eval() {
+double NumberAST::eval() {
     std::cout<<mValue<<std::endl;
     return mValue;
 }
 
-double VariableExprAST::eval() {
+double VariableAST::eval() {
     std::cout<<mName<<std::endl;
     return 0;
 }

@@ -11,22 +11,22 @@ public:
     virtual double eval();
 };
 
-/// NumberExprAST - Expression class for numeric literals like "1.0".
-class NumberExprAST : public ASTNode {
+/// NumberAST - Expression class for numeric literals like "1.0".
+class NumberAST : public ASTNode {
 private:
     double mValue;
 public:
-    NumberExprAST(double value) : mValue(value) {}
+    NumberAST(double value) : mValue(value) {}
     virtual void print();
     virtual double eval();
 };
 
-/// VariableExprAST - Expression class for referencing a variable, like "a".
-class VariableExprAST : public ASTNode {
+/// VariableAST - Expression class for referencing a variable, like "a".
+class VariableAST : public ASTNode {
 private:
     std::string mName;
 public:
-    VariableExprAST(const std::string &name) : mName(name) {}
+    VariableAST(const std::string &name) : mName(name) {}
     virtual void print();
     virtual double eval();
 };

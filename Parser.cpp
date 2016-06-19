@@ -35,7 +35,7 @@ bool Parser::parse() {
 }
 
 ASTNode *Parser::parseNumber() {
-    ASTNode *result = new NumberExprAST(strtod(curToken.second.c_str(), nullptr));
+    ASTNode *result = new NumberAST(strtod(curToken.second.c_str(), nullptr));
     getNextToken();
     return result;
 }
@@ -55,7 +55,7 @@ ASTNode *Parser::parseIdentifier() {
     getNextToken();
     // variable name
     if (curToken.first != Token::OPERATOR || curToken.second[0] != '(') {
-        return new VariableExprAST(identifier);
+        return new VariableAST(identifier);
     }
     return nullptr;
     // // function
