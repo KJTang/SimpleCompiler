@@ -52,21 +52,44 @@ class BlockAST : public ASTNode {
 private:
     std::vector<ASTNode*> statements;
 public:
-    BlockAST(const std::vector<ASTNode*> &v) : statements(v) {}
+    BlockAST(const std::vector<ASTNode*> &stat) : statements(stat) {}
     ~BlockAST() {
         for (int i = 0; i != statements.size(); ++i) {
             delete statements[i];
         }
     }
-    // virtual void print();
+    virtual void print();
     // virtual double eval();  
 };
 
 /// IfExprAST
 class IfExprAST : public ASTNode {
+private:
+    ASTNode *condAST, *ifBlockAST, *elseBlockAST;
 public:
-    IfExprAST(ASTNode *cond, ASTNode *stat) {}
-    ~IfExprAST() {}
+    IfExprAST(ASTNode *cond, ASTNode *ifblock, ASTNode *elseblock) : 
+    condAST(cond), ifBlockAST(ifblock), elseBlockAST(elseblock) {}
+    ~IfExprAST() {
+        delete condAST;
+        delete ifBlockAST;
+        if (elseBlockAST) {
+            delete elseBlockAST;
+        }
+    }
+    virtual void print();
+};
+
+/// WhileExprAST
+class WhileExprAST : public ASTNode {
+private:
+    ASTNode *condAST, *blockAST;
+public:
+    WhileExprAST(ASTNode *cond, ASTNode *block) : condAST(cond), blockAST(block) {}
+    ~WhileExprAST() {
+        delete condAST;
+        delete blockAST;
+    }
+    virtual void print();
 };
 
 /// StatementAST

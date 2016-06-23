@@ -5,8 +5,8 @@
 
 Token Lexer::lexToken() {
     char curChar = lexingStr[lexingPos++];
-    // shift space
-    while (curChar == ' ') {
+    // shift space and '\n'
+    while (curChar == ' ' || curChar == '\n') {
         curChar = lexingStr[lexingPos++];
     }
     // identifier
@@ -23,6 +23,12 @@ Token Lexer::lexToken() {
         if (identifierName == "if") {
             tokens.push_back(std::make_pair(Token::KEYWORD_IF, identifierName));
             return Token::KEYWORD_IF;
+        } else if (identifierName == "else") {
+            tokens.push_back(std::make_pair(Token::KEYWORD_ELSE, identifierName));
+            return Token::KEYWORD_ELSE;
+        } else if (identifierName == "while") {
+            tokens.push_back(std::make_pair(Token::KEYWORD_WHILE, identifierName));
+            return Token::KEYWORD_WHILE;
         } else if (identifierName == "int") {
             tokens.push_back(std::make_pair(Token::KEYWORD_INT, identifierName));
             return Token::KEYWORD_INT;
@@ -49,11 +55,11 @@ Token Lexer::lexToken() {
         return Token::NUMBER;
     }
     switch (curChar) {
-        // end of line
-        case '\n': {
-            tokens.push_back(std::make_pair(Token::END_OF_LINE, "\\n"));
-            return Token::END_OF_LINE;
-        }
+        // // end of line
+        // case '\n': {
+        //     tokens.push_back(std::make_pair(Token::END_OF_LINE, "\\n"));
+        //     return Token::END_OF_LINE;
+        // }
         // end of file
         case '\0': {
             tokens.push_back(std::make_pair(Token::END_OF_FILE, "\0"));
@@ -75,19 +81,6 @@ Token Lexer::lexToken() {
             }
             // if not '//', jump to ascii
         }
-        // // operator: +-*/(){},;
-        // case ';': 
-        // case ',': 
-        // case '+': 
-        // case '-': 
-        // case '*': 
-        // case '(': 
-        // case ')': 
-        // case '{': 
-        // case '}': {
-        //     tokens.push_back(std::make_pair(Token::OPERATOR, std::string(1, curChar)));
-        //     return Token::OPERATOR;
-        // }
         // ascii
         default: {
             tokens.push_back(std::make_pair((Token)curChar, std::string(1, curChar)));

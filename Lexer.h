@@ -4,14 +4,16 @@
 #include <vector>
 
 enum class Token : int {
-    END_OF_LINE = 128, 
-    END_OF_FILE, 
     IDENTIFIER, 
     NUMBER, 
     OPERATOR,           // operator: +-*/(){},;
     KEYWORD_IF,         // if
+    KEYWORD_ELSE,       // else
+    KEYWORD_WHILE,      // while
     KEYWORD_INT,        // int
     KEYWORD_RET,        // return
+    // END_OF_LINE, 
+    END_OF_FILE = -1
 };
 
 class Lexer {

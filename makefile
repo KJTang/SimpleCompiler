@@ -12,22 +12,22 @@ SRC =   main.cpp \
 # object files
 OBJS = $(SRC:.cpp=.o)
 # compile setting
-COMPILE_FLAGS = -std=c++11
+COMPILE_FLAGS = -std=c++11 -ggdb
 # include files
 INCLUDE_PATH = 
 # library 
-LINKER_FLAGS = 
+LINKER_FLAGS = -std=c++11
 
 all : $(TARGET)
 # target file generate rule
 $(TARGET) : $(OBJS)
-	$(CC) $(OBJS) $(LINKER_FLAGS) -o $(TARGET) $(COMPILE_FLAGS)
+	$(CC) $(OBJS) -o $(TARGET) $(LINKER_FLAGS)
 
 # define suffixes rule
 .SUFFIXES : .cpp
 # object file generate rule
 .cpp.o :
-	$(CC) $(INCLUDE_PATH) $(LINKER_FLAGS) -c $< -std=c++11
+	$(CC) $(INCLUDE_PATH) -c $< $(COMPILE_FLAGS)
 # clean
 clean:
 	rm $(TARGET) $(OBJS)

@@ -26,7 +26,7 @@ int main(int argc, char *args[]) {
 
     Lexer lexer(str);
     lexer.lex();
-    lexer.print();
+    // lexer.print();
 
     Parser parser(lexer.getTokens());
     parser.parse();

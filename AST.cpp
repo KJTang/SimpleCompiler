@@ -20,6 +20,30 @@ void BinaryExprAST::print() {
     RHS->print();
 }
 
+void BlockAST::print() {
+    std::cout<<"block: {"<<std::endl;
+    for (auto it = statements.begin(); it != statements.end(); ++it) {
+        (*it)->print();
+    }
+    std::cout<<"}"<<std::endl;
+}
+
+void IfExprAST::print() {
+    std::cout<<"if\t";
+    condAST->print();
+    ifBlockAST->print();
+    if (elseBlockAST) {
+        std::cout<<"else\t";
+        elseBlockAST->print();
+    }
+}
+
+void WhileExprAST::print() {
+    std::cout<<"while\t";
+    condAST->print();
+    blockAST->print();
+}
+
 void CallExprAST::print() {
     std::cout<<"call: "<<mCallee<<std::endl;
 }

@@ -54,6 +54,8 @@ public:
     ASTNode *parseBlock();
     // <IfExpr> ::= "if" <ParenExpr> <Block>
     ASTNode *parseIfExpr();
+    // <WhileExpr> ::= "while" <Expression> <Block>
+    ASTNode *parseWhileExpr();
 
     // test
     void print();
