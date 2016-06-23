@@ -40,6 +40,8 @@ public:
     
     bool parse();
 
+    // <Statement> ::= <Expression> | <Block> | <IfExpr> 
+    ASTNode *parseStatement();
     // <Number>
     ASTNode *parseNumber();
     // <Identifier> ::= variable name or function name

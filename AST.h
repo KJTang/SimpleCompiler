@@ -47,6 +47,36 @@ public:
     virtual double eval();
 };
 
+/// BlockAST
+class BlockAST : public ASTNode {
+private:
+    std::vector<ASTNode*> statements;
+public:
+    BlockAST(const std::vector<ASTNode*> &v) : statements(v) {}
+    ~BlockAST() {
+        for (int i = 0; i != statements.size(); ++i) {
+            delete statements[i];
+        }
+    }
+    // virtual void print();
+    // virtual double eval();  
+};
+
+/// IfExprAST
+class IfExprAST : public ASTNode {
+public:
+    IfExprAST(ASTNode *cond, ASTNode *stat) {}
+    ~IfExprAST() {}
+};
+
+/// StatementAST
+class StatementAST : public ASTNode {
+public:
+    StatementAST() {}
+    ~StatementAST() {}
+    
+};
+
 /// CallExprAST - Expression class for function calls.
 class CallExprAST : public ASTNode {
 private:

@@ -4,12 +4,12 @@
 #include <vector>
 
 enum class Token : int {
-    UNKNOWN, 
-    END_OF_LINE, 
+    END_OF_LINE = 128, 
     END_OF_FILE, 
     IDENTIFIER, 
     NUMBER, 
     OPERATOR,           // operator: +-*/(){},;
+    KEYWORD_IF,         // if
     KEYWORD_INT,        // int
     KEYWORD_RET,        // return
 };

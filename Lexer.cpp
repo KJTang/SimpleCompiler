@@ -20,7 +20,10 @@ Token Lexer::lexToken() {
             curChar = lexingStr[lexingPos++];
         }
         --lexingPos;
-        if (identifierName == "int") {
+        if (identifierName == "if") {
+            tokens.push_back(std::make_pair(Token::KEYWORD_IF, identifierName));
+            return Token::KEYWORD_IF;
+        } else if (identifierName == "int") {
             tokens.push_back(std::make_pair(Token::KEYWORD_INT, identifierName));
             return Token::KEYWORD_INT;
         } else if (identifierName == "return") {
@@ -70,26 +73,25 @@ Token Lexer::lexToken() {
                     return Token::END_OF_FILE;
                 }
             }
-            // if not '//', jump to operator
+            // if not '//', jump to ascii
         }
-        // operator: +-*/(){},;
-        case ';': 
-        case ',': 
-        case '+': 
-        case '-': 
-        case '*': 
-        case '(': 
-        case ')': 
-        case '{': 
-        case '}': {
-            tokens.push_back(std::make_pair(Token::OPERATOR, std::string(1, curChar)));
-            return Token::OPERATOR;
-        }
-        // unknown
+        // // operator: +-*/(){},;
+        // case ';': 
+        // case ',': 
+        // case '+': 
+        // case '-': 
+        // case '*': 
+        // case '(': 
+        // case ')': 
+        // case '{': 
+        // case '}': {
+        //     tokens.push_back(std::make_pair(Token::OPERATOR, std::string(1, curChar)));
+        //     return Token::OPERATOR;
+        // }
+        // ascii
         default: {
-            // std::cout<<"Lexing Unknown Character: "<<curChar<<std::endl;
-            tokens.push_back(std::make_pair(Token::UNKNOWN, std::string(1, curChar)));
-            return Token::UNKNOWN;
+            tokens.push_back(std::make_pair((Token)curChar, std::string(1, curChar)));
+            return (Token)curChar;
         }
     }
 }
