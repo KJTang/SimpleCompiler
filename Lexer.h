@@ -10,8 +10,8 @@ enum class Token : int {
     KEYWORD_IF,         // if
     KEYWORD_ELSE,       // else
     KEYWORD_WHILE,      // while
-    KEYWORD_INT,        // int
     KEYWORD_RET,        // return
+    TYPE_INT,           // int
     // END_OF_LINE, 
     END_OF_FILE = -1
 };

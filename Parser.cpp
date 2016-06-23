@@ -5,42 +5,17 @@
 
 #include <cassert>
 
-#define DEBUG
+// #define DEBUG
 
 bool Parser::parse() {
-    getNextToken();
-    ASTNode *newStat = this->parseStatement();
-    if (newStat) {
-        ASTList.push_back(newStat);
+    getNextToken(); // start parsing
+    ASTNode *newStat = nullptr;
+    while (curToken.first != Token::END_OF_FILE) {
+        newStat = this->parseStatement();
+        if (newStat) {
+            ASTList.push_back(newStat);
+        }
     }
-    
-
-    // while (true) {
-    //     switch (curToken.first) {
-    //         case Token::END_OF_FILE: {
-    //             return true;
-    //         }
-    //         case Token::END_OF_LINE: {
-    //             getNextToken();
-    //             break;
-    //         }
-    //         case Token::KEYWORD_INT: {
-    //             // TODO:
-    //             break;
-    //         }
-    //         case Token::KEYWORD_RET: {
-    //             // TODO:
-    //             break;
-    //         }
-    //         default: {
-    //             ASTNode *newExpr = this->parseExpression();
-    //             if (newExpr) {
-    //                 ASTList.push_back(newExpr);
-    //             }
-    //             break;
-    //         }
-    //     }
-    // }
     return true;
 }
 
@@ -49,13 +24,15 @@ ASTNode *Parser::parseStatement() {
     std::cout<<curToken.second<<"\tparseStatement"<<std::endl;
     #endif
     switch (curToken.first) {
-        // case Token::KEYWORD_INT:
         // case Token::KEYWORD_RET:
         case Token::KEYWORD_IF: {
             return this->parseIfExpr();
         }
         case Token::KEYWORD_WHILE: {
             return this->parseWhileExpr();
+        }
+        case Token::TYPE_INT: {
+            return this->parseAssignExpr();
         }
         default: {
             return this->parseExpression();
@@ -234,6 +211,23 @@ ASTNode *Parser::parseWhileExpr() {
     ASTNode *whileExpr = new WhileExprAST(cond, block);
     return whileExpr;
 }
+
+ASTNode *Parser::parseAssignExpr() {
+    switch (curToken.first) {
+        case Token::TYPE_INT: {
+            getNextToken(); // eat "int"
+            ASTNode *varName = this->parseIdentifier();
+            getNextToken(); // eat '='
+            ASTNode *rightValue = this->parseExpression();
+            return new BinaryExprAST('=', varName, rightValue);
+        }
+        default: {
+            std::cout<<curToken.second<<" is not a type name"<<std::endl;
+        }
+    }
+    return nullptr;
+}
+
 
 void Parser::print() {
     for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {

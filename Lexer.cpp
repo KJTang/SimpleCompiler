@@ -30,8 +30,8 @@ Token Lexer::lexToken() {
             tokens.push_back(std::make_pair(Token::KEYWORD_WHILE, identifierName));
             return Token::KEYWORD_WHILE;
         } else if (identifierName == "int") {
-            tokens.push_back(std::make_pair(Token::KEYWORD_INT, identifierName));
-            return Token::KEYWORD_INT;
+            tokens.push_back(std::make_pair(Token::TYPE_INT, identifierName));
+            return Token::TYPE_INT;
         } else if (identifierName == "return") {
             tokens.push_back(std::make_pair(Token::KEYWORD_RET, identifierName));
             return Token::KEYWORD_RET;

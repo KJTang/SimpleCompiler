@@ -22,7 +22,6 @@ private:
 
     // operators(+ - / *) precedence
     std::map<char, int> BinaryOperatorPrecedence = {
-        {',', 0},
         {'<', 1}, 
         {'>', 1}, 
         {'+', 2}, 
@@ -59,6 +58,8 @@ public:
     ASTNode *parseIfExpr();
     // <WhileExpr> ::= "while" <Expression> <Block>
     ASTNode *parseWhileExpr();
+    // <AssignExpr> ::= <TypeName> <Identifier>
+    ASTNode *parseAssignExpr();
 
     // test
     void print();
