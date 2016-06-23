@@ -16,6 +16,9 @@ private:
     std::pair<Token, std::string> &getNextToken() {
         return curToken = mTokens[pos++];
     }
+    std::pair<Token, std::string> &getLastToken() {
+        return mTokens[pos-1];
+    }
 
     // operators(+ - / *) precedence
     std::map<char, int> BinaryOperatorPrecedence = {

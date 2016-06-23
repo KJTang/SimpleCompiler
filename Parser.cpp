@@ -95,24 +95,21 @@ ASTNode *Parser::parseIdentifier() {
     if (curToken.first != static_cast<Token>('(')) {
         return new VariableAST(identifier);
     }
-    return nullptr;
-    // // function
-    // getNextToken();
-    // std::vector<ASTNode*> args;
-    // while (true) {
-    //     ASTNode *arg = parseExpression();
-    //     if (!arg) {
-    //         return nullptr;
-    //     }
-    //     args.push_back(arg);
-    //     if (curToken.first == Token::LABEL_L_PAREN) {
-    //         break;
-    //     }
-    //     if (curToken.first != Token::LABEL_COMMA) {
-    //         std::cout<<"Missing \',\'"<<std::endl;
-    //     }
-    //     getNextToken();
-    // }
+    // function call
+    getNextToken(); // eat '('
+    std::vector<ASTNode*> args;
+    while (true) {
+        ASTNode *arg = parseExpression();
+        if (arg) {
+            args.push_back(arg);
+        }
+        auto lastToken = getLastToken();
+        if (lastToken.first == static_cast<Token>(')')) {
+            getNextToken(); // eat ')'
+            break;
+        }
+    }
+    return new CallExprAST(identifier, args);
 }
 
 ASTNode *Parser::parseExpression() {
@@ -138,10 +135,14 @@ ASTNode *Parser::parseExpression() {
                 numStack.push(this->parseParenExpr());
                 break;
             }
+            case static_cast<Token>(','): {
+                // expression end
+                // std::cout<<","<<std::endl;
+            }
             case static_cast<Token>(';'): {
                 // expression end
                 // std::cout<<";"<<std::endl;
-                getNextToken();
+                getNextToken(); // eat ',' or ';'
             }
             case static_cast<Token>(')'): {
                 // expression end

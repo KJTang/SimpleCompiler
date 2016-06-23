@@ -45,7 +45,11 @@ void WhileExprAST::print() {
 }
 
 void CallExprAST::print() {
-    std::cout<<"call: "<<mCallee<<std::endl;
+    std::cout<<"func: "<<mCallee<<"("<<std::endl;
+    for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
+        (*it)->print();
+    }
+    std::cout<<")"<<std::endl;
 }
 
 double ASTNode::eval() {
@@ -81,10 +85,10 @@ double BinaryExprAST::eval() {
             result = LHS->eval() / RHS->eval();
             break;
         }
-        case ',': {
-            result = LHS->eval() , RHS->eval();
-            break;
-        }
+        // case ',': {
+        //     result = LHS->eval() , RHS->eval();
+        //     break;
+        // }
         default: {
             std::cout<<"Unknown BinaryExprAST opr: "<<mOpr<<std::endl;
             break;

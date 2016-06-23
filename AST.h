@@ -108,6 +108,11 @@ private:
 public:
     CallExprAST(const std::string &callee, std::vector<ASTNode*> &args)
         : mCallee(callee), mArgs(args) {}
+    ~CallExprAST() {
+        for (int i = 0; i != mArgs.size(); ++i) {
+            delete mArgs[i];
+        }
+    }
     virtual void print();
 };
 
