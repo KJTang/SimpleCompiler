@@ -52,41 +52,45 @@ void CallExprAST::print() {
     std::cout<<")"<<std::endl;
 }
 
-double ASTNode::eval() {
-    return 0;
+std::string ASTNode::eval() {
+    return "";
 }
 
-double NumberAST::eval() {
-    std::cout<<mValue<<std::endl;
-    return mValue;
+std::string NumberAST::eval() {
+    std::string str = "PUSH "+mValue+" ";
+    return str;
 }
 
-double VariableAST::eval() {
-    std::cout<<mName<<std::endl;
-    return 0;
+std::string VariableAST::eval() {
+    std::string str = "LOAD "+mName+" ";
+    return str;
 }
 
-double BinaryExprAST::eval() {
-    double result;
+std::string BinaryExprAST::eval() {
+    std::string str = "";
     switch (mOpr) {
         case '+': {
-            result = LHS->eval() + RHS->eval();
+            str += LHS->eval() + RHS->eval() + "ADD ";
             break;
         }
         case '-': {
-            result = LHS->eval() - RHS->eval();
+            str += LHS->eval() + RHS->eval() + "SUB ";
             break;
         }
         case '*': {
-            result = LHS->eval() * RHS->eval();
+            str += LHS->eval() + RHS->eval() + "MUL ";
             break;
         }
         case '/': {
-            result = LHS->eval() / RHS->eval();
+            str += LHS->eval() + RHS->eval() + "DIV ";
+            break;
+        }
+        case '=': {
+            str += RHS->eval() + "SAVE " + LHS->eval().substr(5);
             break;
         }
         // case ',': {
-        //     result = LHS->eval() , RHS->eval();
+        //     str = LHS->eval() , RHS->eval();
         //     break;
         // }
         default: {
@@ -94,6 +98,24 @@ double BinaryExprAST::eval() {
             break;
         }
     }
-    std::cout<<result<<std::endl;
-    return result;
+    return str;
+}
+
+std::string BlockAST::eval() {
+    std::string str;
+    for (auto it = statements.begin(); it != statements.end(); ++it) {
+        str += (*it)->eval() + " ";
+    }
+    return str;
+}
+
+std::string IfExprAST::eval() {
+    std::string str = condAST->eval();
+    std::string label = generateJmpLabel();
+    str += "JNZ " + label + " ";    // "JNZ LABEL"
+    str += ifBlockAST->eval() + label + ": ";
+    if (elseBlockAST) {
+        str += elseBlockAST->eval();
+    }
+    return str;
 }

@@ -10,12 +10,12 @@
 bool Parser::parse() {
     getNextToken(); // start parsing
     ASTNode *newStat = nullptr;
-    while (curToken.first != Token::END_OF_FILE) {
+    // while (curToken.first != Token::END_OF_FILE) {
         newStat = this->parseStatement();
         if (newStat) {
             ASTList.push_back(newStat);
         }
-    }
+    // }
     return true;
 }
 
@@ -44,7 +44,8 @@ ASTNode *Parser::parseNumber() {
     #ifdef DEBUG
     std::cout<<curToken.second<<"\tparseNumber"<<std::endl;
     #endif
-    ASTNode *result = new NumberAST(strtod(curToken.second.c_str(), nullptr));
+    // ASTNode *result = new NumberAST(strtod(curToken.second.c_str(), nullptr));
+    ASTNode *result = new NumberAST(curToken.second);
     getNextToken();
     return result;
 }
@@ -238,6 +239,9 @@ void Parser::print() {
     }
 }
 
-std::string Parser::getAsmCode() {
-    return asmcode;
+bool Parser::generateAsmCode() {
+    for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {
+        asmcode += (*it)->eval();
+    }
+    return true;
 }

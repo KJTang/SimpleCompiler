@@ -9,6 +9,7 @@ class Parser {
 private:
     std::vector<std::pair<Token, std::string>> mTokens;
     std::vector<ASTNode*> ASTList;
+    int asmline = 0;
     std::string asmcode;
 
     std::pair<Token, std::string> curToken;
@@ -63,5 +64,8 @@ public:
 
     // test
     void print();
-    std::string getAsmCode();
+    bool generateAsmCode();
+    std::string &getAsmCode() {
+        return asmcode;
+    }
 };

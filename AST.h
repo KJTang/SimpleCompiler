@@ -1,24 +1,36 @@
 #pragma once
 
+#include <sstream>
 #include <string>
 #include <vector>
+
+static int jmpLabel = 0;
+static std::string generateJmpLabel() {
+    std::ostringstream label;
+    label<<"L"<<jmpLabel++;
+    return label.str();
+}
+
 
 /// ASTNode - Base class for all expression nodes.
 class ASTNode {
 public:
     virtual ~ASTNode() {}
     virtual void print();
-    virtual double eval();
+    int line = 0;
+    virtual std::string eval();
 };
 
 /// NumberAST - Expression class for numeric literals like "1.0".
 class NumberAST : public ASTNode {
 private:
-    double mValue;
+    // double mValue;
+    std::string mValue;
 public:
-    NumberAST(double value) : mValue(value) {}
+    // NumberAST(double value) : mValue(value) {}
+    NumberAST(const std::string &value) : mValue(value) {}
     virtual void print();
-    virtual double eval();
+    virtual std::string eval();
 };
 
 /// VariableAST - Expression class for referencing a variable, like "a".
@@ -28,7 +40,7 @@ private:
 public:
     VariableAST(const std::string &name) : mName(name) {}
     virtual void print();
-    virtual double eval();
+    virtual std::string eval();
 };
 
 /// BinaryExprAST - Expression class for a binary operator.
@@ -44,7 +56,7 @@ public:
         delete RHS;
     }
     virtual void print();
-    virtual double eval();
+    virtual std::string eval();
 };
 
 /// BlockAST
@@ -59,7 +71,7 @@ public:
         }
     }
     virtual void print();
-    // virtual double eval();  
+    virtual std::string eval();  
 };
 
 /// IfExprAST
@@ -77,6 +89,7 @@ public:
         }
     }
     virtual void print();
+    virtual std::string eval();
 };
 
 /// WhileExprAST
