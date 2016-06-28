@@ -103,6 +103,7 @@ public:
         delete blockAST;
     }
     virtual void print();
+    virtual std::string eval();
 };
 
 /// StatementAST

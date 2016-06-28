@@ -33,7 +33,7 @@ int main(int argc, char *args[]) {
     parser.print();
     parser.generateAsmCode();
     std::cout<<"------------------ASM CODE------------------"<<std::endl;
-    std::cout<<parser.getAsmCode()<<"<<"<<std::endl;
+    // std::cout<<parser.getAsmCode()<<"<<"<<std::endl;
 
     return 0;
 }

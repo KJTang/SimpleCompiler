@@ -119,3 +119,13 @@ std::string IfExprAST::eval() {
     }
     return str;
 }
+
+std::string WhileExprAST::eval() {
+    std::string condLabel = generateJmpLabel();
+    std::string quitLabel = generateJmpLabel();
+    std::string str = condLabel + ": ";
+    str += condAST->eval();
+    str += "JZ " + quitLabel + " ";
+    str += blockAST->eval() + quitLabel + ": ";
+    return str;
+}
