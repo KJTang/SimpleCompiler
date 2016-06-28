@@ -4,13 +4,14 @@
 #include <string>
 #include <vector>
 
+#include "Lexer.h"
+
 static int jmpLabel = 0;
 static std::string generateJmpLabel() {
     std::ostringstream label;
     label<<"L"<<jmpLabel++;
     return label.str();
 }
-
 
 /// ASTNode - Base class for all expression nodes.
 class ASTNode {
@@ -120,7 +121,7 @@ private:
     std::string mCallee;
     std::vector<ASTNode*> mArgs;
 public:
-    CallExprAST(const std::string &callee, std::vector<ASTNode*> &args)
+    CallExprAST(const std::string &callee, const std::vector<ASTNode*> &args)
         : mCallee(callee), mArgs(args) {}
     ~CallExprAST() {
         for (int i = 0; i != mArgs.size(); ++i) {
@@ -128,28 +129,43 @@ public:
         }
     }
     virtual void print();
+    virtual std::string eval();
 };
 
-/// PrototypeAST - This class represents the "prototype" for a function,
-/// which captures its name, and its argument names (thus implicitly the number
-/// of arguments the function takes).
-class PrototypeAST {
+/// FunctionAST
+class FunctionAST : public ASTNode {
 private:
-    std::string mName;
-    std::vector<std::string> mArgs;
+    std::pair<Token, std::string> mFunc;
+    std::vector<std::pair<Token, std::string>> mArgs;
+    ASTNode *blockAST;
 public:
-    PrototypeAST(const std::string &name, const std::vector<std::string> &args)
-        : mName(name), mArgs(args) {}
-
+    FunctionAST(const std::pair<Token, std::string> &func, const std::vector<std::pair<Token, std::string>> &args, ASTNode *block)
+        : mFunc(func), mArgs(args), blockAST(block) {}
+    ~FunctionAST() {}
+    virtual void print();
+    virtual std::string eval();
 };
 
-/// FunctionAST - This class represents a function definition itself.
-class FunctionAST {
-private:
-    PrototypeAST *mProto;
-    ASTNode *mBody;
-public:
-    FunctionAST(PrototypeAST *proto, ASTNode *body)
-        : mProto(proto), mBody(body) {}
+// /// PrototypeAST - This class represents the "prototype" for a function,
+// /// which captures its name, and its argument names (thus implicitly the number
+// /// of arguments the function takes).
+// class PrototypeAST {
+// private:
+//     std::string mName;
+//     std::vector<std::string> mArgs;
+// public:
+//     PrototypeAST(const std::string &name, const std::vector<std::string> &args)
+//         : mName(name), mArgs(args) {}
 
-};
+// };
+
+// /// FunctionAST - This class represents a function definition itself.
+// class FunctionAST {
+// private:
+//     PrototypeAST *mProto;
+//     ASTNode *mBody;
+// public:
+//     FunctionAST(PrototypeAST *proto, ASTNode *body)
+//         : mProto(proto), mBody(body) {}
+
+// };

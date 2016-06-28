@@ -10,12 +10,12 @@
 bool Parser::parse() {
     getNextToken(); // start parsing
     ASTNode *newStat = nullptr;
-    while (curToken.first != Token::END_OF_FILE) {
+    // while (curToken.first != Token::END_OF_FILE) {
         newStat = this->parseStatement();
         if (newStat) {
             ASTList.push_back(newStat);
         }
-    }
+    // }
     return true;
 }
 
@@ -32,7 +32,8 @@ ASTNode *Parser::parseStatement() {
             return this->parseWhileExpr();
         }
         case Token::TYPE_INT: {
-            return this->parseAssignExpr();
+            // return this->parseAssignExpr();
+            return this->parseDeclaration();
         }
         default: {
             return this->parseExpression();
@@ -81,8 +82,7 @@ ASTNode *Parser::parseIdentifier() {
         if (arg) {
             args.push_back(arg);
         }
-        auto lastToken = getLastToken();
-        if (lastToken.first == static_cast<Token>(')')) {
+        if (curToken.first == static_cast<Token>(')')) {
             getNextToken(); // eat ')'
             break;
         }
@@ -229,6 +229,42 @@ ASTNode *Parser::parseAssignExpr() {
     return nullptr;
 }
 
+ASTNode *Parser::parseDeclaration() {
+    Token aheadToken = lookAheadToken(2).first;
+    // function declaration
+    if (aheadToken == static_cast<Token>('(')) {
+        return this->parseFuncDeclaration();
+    }
+    // variable declaration
+    else {
+        return this->parseVarDeclaration();
+    }
+}
+
+ASTNode *Parser::parseVarDeclaration() {
+    // Token type = curToken.first;
+    // getNextToken(); // eat type name
+    return nullptr;   
+}
+
+ASTNode *Parser::parseFuncDeclaration() {
+    Token type = curToken.first;
+    getNextToken();
+    std::string name = curToken.second;
+    getNextToken();
+    std::vector<std::pair<Token, std::string>> args;
+    while (curToken.first != static_cast<Token>(')')) {
+        getNextToken(); // eat '(' or ','
+        Token varType = curToken.first;
+        getNextToken();
+        std::string varName = curToken.second;
+        getNextToken();
+        args.push_back(std::make_pair(varType, varName));
+    }
+    getNextToken(); // eat ')'
+    ASTNode *block = this->parseBlock();
+    return new FunctionAST(std::make_pair(type, name), args, block);
+}
 
 void Parser::print() {
     for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {

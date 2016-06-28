@@ -45,11 +45,20 @@ void WhileExprAST::print() {
 }
 
 void CallExprAST::print() {
-    std::cout<<"func: "<<mCallee<<"("<<std::endl;
+    std::cout<<"call func: "<<mCallee<<"("<<std::endl;
     for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
         (*it)->print();
     }
     std::cout<<")"<<std::endl;
+}
+
+void FunctionAST::print() {
+    std::cout<<"def func "<<mFunc.second<<": (";
+    for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
+        std::cout<<(*it).second<<", ";
+    }
+    std::cout<<"nullptr) ";
+    blockAST->print();
 }
 
 std::string ASTNode::eval() {
@@ -127,5 +136,19 @@ std::string WhileExprAST::eval() {
     str += condAST->eval();
     str += "JZ " + quitLabel + " ";
     str += blockAST->eval() + quitLabel + ": ";
+    return str;
+}
+
+std::string CallExprAST::eval() {
+    std::string str;
+    for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
+        str += (*it)->eval();
+    }
+    str += "CALL " + mCallee + " ";
+    return str;
+}
+
+std::string FunctionAST::eval() {
+    std::string str;
     return str;
 }

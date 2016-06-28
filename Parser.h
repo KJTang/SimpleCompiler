@@ -17,8 +17,8 @@ private:
     std::pair<Token, std::string> &getNextToken() {
         return curToken = mTokens[pos++];
     }
-    std::pair<Token, std::string> &getLastToken() {
-        return mTokens[pos-1];
+    std::pair<Token, std::string> &lookAheadToken(int offset) {
+        return mTokens[pos+offset-1];
     }
 
     // operators(+ - / *) precedence
@@ -61,6 +61,10 @@ public:
     ASTNode *parseWhileExpr();
     // <AssignExpr> ::= <TypeName> <Identifier>
     ASTNode *parseAssignExpr();
+    // 
+    ASTNode *parseDeclaration();
+    ASTNode *parseFuncDeclaration();
+    ASTNode *parseVarDeclaration();
 
     // test
     void print();
