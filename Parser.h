@@ -65,6 +65,8 @@ public:
     ASTNode *parseDeclaration();
     ASTNode *parseFuncDeclaration();
     ASTNode *parseVarDeclaration();
+    // 
+    ASTNode *parseFuncReturn();
 
     // test
     void print();

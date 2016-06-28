@@ -35,6 +35,9 @@ ASTNode *Parser::parseStatement() {
             // return this->parseAssignExpr();
             return this->parseDeclaration();
         }
+        case Token::KEYWORD_RET: {
+            return this->parseFuncReturn();
+        }
         default: {
             return this->parseExpression();
         }
@@ -264,6 +267,15 @@ ASTNode *Parser::parseFuncDeclaration() {
     getNextToken(); // eat ')'
     ASTNode *block = this->parseBlock();
     return new FunctionAST(std::make_pair(type, name), args, block);
+}
+
+ASTNode *Parser::parseFuncReturn() {
+    getNextToken(); // eat "return"
+    ASTNode *retExpr = this->parseExpression();
+    if (!retExpr) {
+        retExpr = new NumberAST("0");
+    }
+    return new ReturnAST(retExpr);
 }
 
 void Parser::print() {

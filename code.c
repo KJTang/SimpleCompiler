@@ -2,6 +2,7 @@ int func1(int a, int b) {
     // 
     a = a + b;
     b = func2();
+    return 1+1/2;
 }
 // if (1) {
 //     a = 100+1*10/a-9;

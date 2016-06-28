@@ -132,11 +132,7 @@ std::string IfExprAST::eval() {
 std::string WhileExprAST::eval() {
     std::string condLabel = generateJmpLabel();
     std::string quitLabel = generateJmpLabel();
-    std::string str = condLabel + ": ";
-    str += condAST->eval();
-    str += "JZ " + quitLabel + " ";
-    str += blockAST->eval() + quitLabel + ": ";
-    return str;
+    return condLabel + ": " + condAST->eval() + "JZ " + quitLabel + " " + blockAST->eval() + quitLabel + ": ";
 }
 
 std::string CallExprAST::eval() {
@@ -148,7 +144,10 @@ std::string CallExprAST::eval() {
     return str;
 }
 
+std::string ReturnAST::eval() {
+    return retValue->eval() + "RET ";
+}
+
 std::string FunctionAST::eval() {
-    std::string str;
-    return str;
+    return "FUNC " + mFunc.second + " " + blockAST->eval() + "ENDF ";
 }

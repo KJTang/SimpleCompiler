@@ -132,6 +132,17 @@ public:
     virtual std::string eval();
 };
 
+class ReturnAST : public ASTNode {
+private:
+    ASTNode *retValue;
+public:
+    ReturnAST(ASTNode *value) : retValue(value) {}
+    ~ReturnAST() {
+        delete retValue;
+    }
+    virtual std::string eval();
+};
+
 /// FunctionAST
 class FunctionAST : public ASTNode {
 private:
@@ -141,7 +152,9 @@ private:
 public:
     FunctionAST(const std::pair<Token, std::string> &func, const std::vector<std::pair<Token, std::string>> &args, ASTNode *block)
         : mFunc(func), mArgs(args), blockAST(block) {}
-    ~FunctionAST() {}
+    ~FunctionAST() {
+        delete blockAST;
+    }
     virtual void print();
     virtual std::string eval();
 };
