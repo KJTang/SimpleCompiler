@@ -104,7 +104,7 @@ std::string BinaryExprAST::eval() {
 std::string BlockAST::eval() {
     std::string str;
     for (auto it = statements.begin(); it != statements.end(); ++it) {
-        str += (*it)->eval() + " ";
+        str += (*it)->eval();
     }
     return str;
 }
@@ -112,7 +112,7 @@ std::string BlockAST::eval() {
 std::string IfExprAST::eval() {
     std::string str = condAST->eval();
     std::string label = generateJmpLabel();
-    str += "JNZ " + label + " ";    // "JNZ LABEL"
+    str += "JZ " + label + " ";    // "JZ LABEL"
     str += ifBlockAST->eval() + label + ": ";
     if (elseBlockAST) {
         str += elseBlockAST->eval();
