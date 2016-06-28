@@ -40,7 +40,24 @@ private:
     std::string mName;
 public:
     VariableAST(const std::string &name) : mName(name) {}
+    std::string &getName() {
+        return mName;
+    }
     virtual void print();
+    virtual std::string eval();
+};
+
+class AssignmentAST : public ASTNode {
+private:
+    Token mType;
+    std::vector<ASTNode*> mVarList;
+public:
+    AssignmentAST(Token type, const std::vector<ASTNode*> &varList) : mType(type), mVarList(varList) {}
+    ~AssignmentAST() {
+        for (int i = 0; i != mVarList.size(); ++i) {
+            delete mVarList[i];
+        }
+    }
     virtual std::string eval();
 };
 
@@ -55,6 +72,12 @@ public:
     ~BinaryExprAST() {
         delete LHS;
         delete RHS;
+    }
+    ASTNode *getLNode() {
+        return LHS;
+    }
+    ASTNode *getRNode() {
+        return RHS;
     }
     virtual void print();
     virtual std::string eval();

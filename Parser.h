@@ -23,6 +23,7 @@ private:
 
     // operators(+ - / *) precedence
     std::map<char, int> BinaryOperatorPrecedence = {
+        {'=', 0}, 
         {'<', 1}, 
         {'>', 1}, 
         {'+', 2}, 

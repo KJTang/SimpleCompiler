@@ -66,12 +66,19 @@ std::string ASTNode::eval() {
 }
 
 std::string NumberAST::eval() {
-    std::string str = "PUSH "+mValue+" ";
-    return str;
+    return "PUSH "+mValue+" ";
 }
 
 std::string VariableAST::eval() {
-    std::string str = "LOAD "+mName+" ";
+    return "LOAD "+mName+" ";
+}
+
+std::string AssignmentAST::eval() {
+    std::string str;
+    for (auto it = mVarList.begin(); it != mVarList.end(); ++it) {
+        str += "INT " + static_cast<VariableAST*>(static_cast<BinaryExprAST*>(*it)->getLNode())->getName()
+         + " " + (*it)->eval();
+    }
     return str;
 }
 

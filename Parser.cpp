@@ -251,9 +251,28 @@ ASTNode *Parser::parseVarDeclaration() {
     #ifdef DEBUG
     std::cout<<curToken.second<<"\tparseVarDeclaration"<<std::endl;
     #endif
-    // Token type = curToken.first;
-    // getNextToken(); // eat type name
-    return nullptr;   
+    Token type = curToken.first;
+    getNextToken(); // eat type name
+    std::vector<ASTNode*> varList;
+    while (true) {
+        ASTNode *var = this->parseIdentifier();
+        if (curToken.first == static_cast<Token>(',')) {
+            getNextToken();
+            varList.push_back(new BinaryExprAST('=', var, new NumberAST("0")));
+        } else if (curToken.first == static_cast<Token>('=')) {
+            getNextToken();
+            ASTNode *expr = this->parseExpression();
+            varList.push_back(new BinaryExprAST('=', var, expr));
+            if (lookAheadToken(-1).first == static_cast<Token>(';')) {
+                break;
+            }
+        } else if (curToken.first == static_cast<Token>(';')) {
+            getNextToken();
+            varList.push_back(new BinaryExprAST('=', var, new NumberAST("0")));
+            break;
+        }
+    }
+    return new AssignmentAST(type, varList);   
 }
 
 ASTNode *Parser::parseFuncDeclaration() {
