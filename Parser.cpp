@@ -5,17 +5,17 @@
 
 #include <cassert>
 
-// #define DEBUG
+#define DEBUG
 
 bool Parser::parse() {
     getNextToken(); // start parsing
     ASTNode *newStat = nullptr;
-    // while (curToken.first != Token::END_OF_FILE) {
+    while (curToken.first != Token::END_OF_FILE) {
         newStat = this->parseStatement();
         if (newStat) {
             ASTList.push_back(newStat);
         }
-    // }
+    }
     return true;
 }
 
@@ -216,23 +216,26 @@ ASTNode *Parser::parseWhileExpr() {
     return whileExpr;
 }
 
-ASTNode *Parser::parseAssignExpr() {
-    switch (curToken.first) {
-        case Token::TYPE_INT: {
-            getNextToken(); // eat "int"
-            ASTNode *varName = this->parseIdentifier();
-            getNextToken(); // eat '='
-            ASTNode *rightValue = this->parseExpression();
-            return new BinaryExprAST('=', varName, rightValue);
-        }
-        default: {
-            std::cout<<curToken.second<<" is not a type name"<<std::endl;
-        }
-    }
-    return nullptr;
-}
+// ASTNode *Parser::parseAssignExpr() {
+//     switch (curToken.first) {
+//         case Token::TYPE_INT: {
+//             getNextToken(); // eat "int"
+//             ASTNode *varName = this->parseIdentifier();
+//             getNextToken(); // eat '='
+//             ASTNode *rightValue = this->parseExpression();
+//             return new BinaryExprAST('=', varName, rightValue);
+//         }
+//         default: {
+//             std::cout<<curToken.second<<" is not a type name"<<std::endl;
+//         }
+//     }
+//     return nullptr;
+// }
 
 ASTNode *Parser::parseDeclaration() {
+    #ifdef DEBUG
+    std::cout<<curToken.second<<"\tparseDeclaration"<<std::endl;
+    #endif
     Token aheadToken = lookAheadToken(2).first;
     // function declaration
     if (aheadToken == static_cast<Token>('(')) {
@@ -245,24 +248,37 @@ ASTNode *Parser::parseDeclaration() {
 }
 
 ASTNode *Parser::parseVarDeclaration() {
+    #ifdef DEBUG
+    std::cout<<curToken.second<<"\tparseVarDeclaration"<<std::endl;
+    #endif
     // Token type = curToken.first;
     // getNextToken(); // eat type name
     return nullptr;   
 }
 
 ASTNode *Parser::parseFuncDeclaration() {
+    #ifdef DEBUG
+    std::cout<<curToken.second<<"\tparseFuncDeclaration"<<std::endl;
+    #endif
     Token type = curToken.first;
-    getNextToken();
+    getNextToken(); // eat function return value type
     std::string name = curToken.second;
-    getNextToken();
+    getNextToken(); // eat function name
     std::vector<std::pair<Token, std::string>> args;
-    while (curToken.first != static_cast<Token>(')')) {
-        getNextToken(); // eat '(' or ','
-        Token varType = curToken.first;
-        getNextToken();
-        std::string varName = curToken.second;
-        getNextToken();
-        args.push_back(std::make_pair(varType, varName));
+    // if function has argument
+    if (lookAheadToken(1).first != static_cast<Token>(')')) {
+        do {
+            getNextToken(); // eat '(' or ','
+            Token varType = curToken.first;
+            getNextToken(); // eat type name
+            std::string varName = curToken.second;
+            getNextToken(); // eat arg name
+            args.push_back(std::make_pair(varType, varName));
+        } while (curToken.first != static_cast<Token>(')'));
+    }
+    // else function has no argument
+    else {
+        getNextToken(); // eat '('
     }
     getNextToken(); // eat ')'
     ASTNode *block = this->parseBlock();
@@ -270,6 +286,9 @@ ASTNode *Parser::parseFuncDeclaration() {
 }
 
 ASTNode *Parser::parseFuncReturn() {
+    #ifdef DEBUG
+    std::cout<<curToken.second<<"\tparseFuncReturn"<<std::endl;
+    #endif
     getNextToken(); // eat "return"
     ASTNode *retExpr = this->parseExpression();
     if (!retExpr) {

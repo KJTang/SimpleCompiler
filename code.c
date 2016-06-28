@@ -1,43 +1,10 @@
-int func1(int a, int b) {
-    // 
-    a = a + b;
-    b = func2();
-    return 1+1/2;
+int add(int a, int b) {
+    return a+b;
 }
-// if (1) {
-//     a = 100+1*10/a-9;
-// } else {
-//     a = 15 - 5;
-// }
-// while (a) {
-//     a = a + 1;
-//     int b = 0, c = 1;
-// }
-// int a = 100+1*10/f(1, 2, 3*(2-1))-9;
-// while (1) {
-//     func(a, 1, b(c+d+1));
-//     20, 100 - 30;
-//     100 + (a / 5) *(3+7) - (25+25);
-//     if (0) {
-//         11;
-//     } else {
-//         1, 2, 3;
-//     }
-//     a + 3 - 5;
-// };;;
-// if (a) {
-//     print;
-// } else if (b) {
-//     print;
-// } 
 
-// int a = 100;
-// 
-// #include <stdio.h>
+int main() {
+    print(add(a, b));
+    return 0;
+}
 
-// int main() {
-//     // 
-//     return 1; // test
-//     // fdsa f
-//     a = 1/0;
-// }
+// int g = 5-3/2*(1+3);

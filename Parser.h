@@ -60,7 +60,7 @@ public:
     // <WhileExpr> ::= "while" <Expression> <Block>
     ASTNode *parseWhileExpr();
     // <AssignExpr> ::= <TypeName> <Identifier>
-    ASTNode *parseAssignExpr();
+    // ASTNode *parseAssignExpr();
     // 
     ASTNode *parseDeclaration();
     ASTNode *parseFuncDeclaration();
