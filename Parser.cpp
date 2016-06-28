@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-#define DEBUG
+// #define DEBUG
 
 bool Parser::parse() {
     getNextToken(); // start parsing
@@ -16,6 +16,13 @@ bool Parser::parse() {
             ASTList.push_back(newStat);
         }
     }
+    for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {
+        // asmcode += (*it)->eval();
+        // test
+        std::string temp = (*it)->eval();
+        std::cout<<temp<<"<<"<<std::endl;
+        asmcode += temp;
+    }
     return true;
 }
 
@@ -24,7 +31,6 @@ ASTNode *Parser::parseStatement() {
     std::cout<<curToken.second<<"\tparseStatement"<<std::endl;
     #endif
     switch (curToken.first) {
-        // case Token::KEYWORD_RET:
         case Token::KEYWORD_IF: {
             return this->parseIfExpr();
         }
@@ -32,7 +38,6 @@ ASTNode *Parser::parseStatement() {
             return this->parseWhileExpr();
         }
         case Token::TYPE_INT: {
-            // return this->parseAssignExpr();
             return this->parseDeclaration();
         }
         case Token::KEYWORD_RET: {
@@ -90,7 +95,7 @@ ASTNode *Parser::parseIdentifier() {
             break;
         }
     }
-    return new CallExprAST(identifier, args);
+    return new CallFuncAST(identifier, args);
 }
 
 ASTNode *Parser::parseExpression() {
@@ -102,32 +107,24 @@ ASTNode *Parser::parseExpression() {
     while (true) {
         switch (curToken.first) {
             case Token::NUMBER: {
-                // std::cout<<"number"<<std::endl;
                 numStack.push(this->parseNumber());
                 break;
             }
             case Token::IDENTIFIER: {
-                // std::cout<<"identifier"<<std::endl;
                 numStack.push(this->parseIdentifier());
                 break;
             }
             case static_cast<Token>('('): {
-                // std::cout<<"("<<std::endl;
                 numStack.push(this->parseParenExpr());
                 break;
             }
-            case static_cast<Token>(','): {
-                // expression end
-                // std::cout<<","<<std::endl;
-            }
+            case static_cast<Token>(','): 
             case static_cast<Token>(';'): {
                 // expression end
-                // std::cout<<";"<<std::endl;
                 getNextToken(); // eat ',' or ';'
             }
             case static_cast<Token>(')'): {
                 // expression end
-                // std::cout<<")"<<std::endl;
                 while (!opStack.empty()) {
                     char op = opStack.top();
                     opStack.pop();
@@ -215,22 +212,6 @@ ASTNode *Parser::parseWhileExpr() {
     ASTNode *whileExpr = new WhileExprAST(cond, block);
     return whileExpr;
 }
-
-// ASTNode *Parser::parseAssignExpr() {
-//     switch (curToken.first) {
-//         case Token::TYPE_INT: {
-//             getNextToken(); // eat "int"
-//             ASTNode *varName = this->parseIdentifier();
-//             getNextToken(); // eat '='
-//             ASTNode *rightValue = this->parseExpression();
-//             return new BinaryExprAST('=', varName, rightValue);
-//         }
-//         default: {
-//             std::cout<<curToken.second<<" is not a type name"<<std::endl;
-//         }
-//     }
-//     return nullptr;
-// }
 
 ASTNode *Parser::parseDeclaration() {
     #ifdef DEBUG
@@ -320,18 +301,6 @@ void Parser::print() {
     for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {
         std::cout<<"Expr Start ---"<<std::endl;
         (*it)->print();
-        // (*it)->eval();
         std::cout<<"Expr End   ---"<<std::endl;
     }
-}
-
-bool Parser::generateAsmCode() {
-    for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {
-        // asmcode += (*it)->eval();
-        // test
-        std::string temp = (*it)->eval();
-        std::cout<<temp<<"<<"<<std::endl;
-        asmcode += temp;
-    }
-    return true;
 }

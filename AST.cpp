@@ -44,7 +44,7 @@ void WhileExprAST::print() {
     blockAST->print();
 }
 
-void CallExprAST::print() {
+void CallFuncAST::print() {
     std::cout<<"call func: "<<mCallee<<"("<<std::endl;
     for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
         (*it)->print();
@@ -142,7 +142,7 @@ std::string WhileExprAST::eval() {
     return condLabel + ": " + condAST->eval() + "JZ " + quitLabel + " " + blockAST->eval() + quitLabel + ": ";
 }
 
-std::string CallExprAST::eval() {
+std::string CallFuncAST::eval() {
     std::string str;
     for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
         str += (*it)->eval();

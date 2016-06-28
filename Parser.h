@@ -42,8 +42,6 @@ public:
         }
     }
     
-    bool parse();
-
     // <Statement> ::= <Expression> | <Block> | <IfExpr> 
     ASTNode *parseStatement();
     // <Number>
@@ -60,18 +58,18 @@ public:
     ASTNode *parseIfExpr();
     // <WhileExpr> ::= "while" <Expression> <Block>
     ASTNode *parseWhileExpr();
-    // <AssignExpr> ::= <TypeName> <Identifier>
-    // ASTNode *parseAssignExpr();
-    // 
+    // <Declaration> ::= <FuncDeclaration> | <VarDeclaration>
     ASTNode *parseDeclaration();
+    // <FuncDeclaration> ::= <Type> <Identifier> <ParenExpr> <Block>
     ASTNode *parseFuncDeclaration();
+    // <VarDeclaration> ::= <Type> <Identifier> {"=" <Expression>} {"," <Identifier> {"=" <Expression>}} ";" 
     ASTNode *parseVarDeclaration();
     // 
     ASTNode *parseFuncReturn();
 
     // test
     void print();
-    bool generateAsmCode();
+    bool parse();
     std::string &getAsmCode() {
         return asmcode;
     }

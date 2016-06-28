@@ -26,12 +26,11 @@ int main(int argc, char *args[]) {
 
     Lexer lexer(str);
     lexer.lex();
-    lexer.print();
+    // lexer.print();
 
     Parser parser(lexer.getTokens());
     parser.parse();
-    parser.print();
-    parser.generateAsmCode();
+    // parser.print();
     std::cout<<"------------------ASM CODE------------------"<<std::endl;
     std::cout<<parser.getAsmCode()<<"<<"<<std::endl;
 
