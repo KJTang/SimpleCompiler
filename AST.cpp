@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+// instructions' end
+const std::string insEnd = "\n";
+
 void ASTNode::print() {
     //
 }
@@ -66,18 +69,18 @@ std::string ASTNode::eval() {
 }
 
 std::string NumberAST::eval() {
-    return "PUSH "+mValue+" ";
+    return "PUSH "+mValue+insEnd;
 }
 
 std::string VariableAST::eval() {
-    return "LOAD "+mName+" ";
+    return "LOAD "+mName+insEnd;
 }
 
 std::string AssignmentAST::eval() {
     std::string str;
     for (auto it = mVarList.begin(); it != mVarList.end(); ++it) {
         str += "INT " + static_cast<VariableAST*>(static_cast<BinaryExprAST*>(*it)->getLNode())->getName()
-         + " " + (*it)->eval();
+         + insEnd + (*it)->eval();
     }
     return str;
 }
@@ -86,19 +89,19 @@ std::string BinaryExprAST::eval() {
     std::string str = "";
     switch (mOpr) {
         case '+': {
-            str += LHS->eval() + RHS->eval() + "ADD ";
+            str += LHS->eval() + RHS->eval() + "ADD" + insEnd;
             break;
         }
         case '-': {
-            str += LHS->eval() + RHS->eval() + "SUB ";
+            str += LHS->eval() + RHS->eval() + "SUB" + insEnd;
             break;
         }
         case '*': {
-            str += LHS->eval() + RHS->eval() + "MUL ";
+            str += LHS->eval() + RHS->eval() + "MUL" + insEnd;
             break;
         }
         case '/': {
-            str += LHS->eval() + RHS->eval() + "DIV ";
+            str += LHS->eval() + RHS->eval() + "DIV" + insEnd;
             break;
         }
         case '=': {
@@ -106,12 +109,11 @@ std::string BinaryExprAST::eval() {
             break;
         }
         case '>': {
-            str += LHS->eval() + RHS->eval() + "GT ";
-            std::cout<<str<<std::endl;
+            str += LHS->eval() + RHS->eval() + "GT" + insEnd;
             break;
         }
         case '<': {
-            str += LHS->eval() + RHS->eval() + "LT ";
+            str += LHS->eval() + RHS->eval() + "LT" + insEnd;
             break;
         }
         // case ',': {
@@ -137,8 +139,8 @@ std::string BlockAST::eval() {
 std::string IfExprAST::eval() {
     std::string str = condAST->eval();
     std::string label = generateJmpLabel();
-    str += "JZ " + label + " ";    // "JZ LABEL"
-    str += ifBlockAST->eval() + label + ": ";
+    str += "JZ " + label + insEnd;    // "JZ LABEL"
+    str += ifBlockAST->eval() + label + ":" + insEnd;
     if (elseBlockAST) {
         str += elseBlockAST->eval();
     }
@@ -148,7 +150,8 @@ std::string IfExprAST::eval() {
 std::string WhileExprAST::eval() {
     std::string condLabel = generateJmpLabel();
     std::string quitLabel = generateJmpLabel();
-    return condLabel + ": " + condAST->eval() + "JZ " + quitLabel + " " + blockAST->eval() + quitLabel + ": ";
+    return condLabel + ":" + insEnd + condAST->eval() + "JZ " + quitLabel + insEnd + 
+        blockAST->eval() + quitLabel + ":" + insEnd;
 }
 
 std::string CallFuncAST::eval() {
@@ -156,14 +159,14 @@ std::string CallFuncAST::eval() {
     for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
         str += (*it)->eval();
     }
-    str += "CALL " + mCallee + " ";
+    str += "CALL " + mCallee + insEnd;
     return str;
 }
 
 std::string ReturnAST::eval() {
-    return retValue->eval() + "RET ";
+    return retValue->eval() + "RET" + insEnd;
 }
 
 std::string FunctionAST::eval() {
-    return "FUNC " + mFunc.second + " " + blockAST->eval() + "ENDF ";
+    return "FUNC " + mFunc.second + insEnd + blockAST->eval() + "ENDF" + insEnd;
 }

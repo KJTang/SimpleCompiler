@@ -1,10 +1,3 @@
-op
-op
-op
-op
-op
-op
-op
 INT g
 PUSH 5
 PUSH 3
@@ -33,3 +26,15 @@ LOAD a
 LOAD b
 ADD
 PUSH 1
+GT
+JZ L0
+LOAD a
+LOAD b
+CALL add
+CALL print
+L0:
+LOAD a
+CALL print
+PUSH 0
+RET
+ENDF

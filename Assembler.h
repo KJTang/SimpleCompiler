@@ -18,6 +18,8 @@ enum class OP {
     SUB,
     MUL,
     DIV,
+    GT, // greater than
+    LT, // less than
     /* stack */
     DUP,
     POP,
@@ -30,6 +32,8 @@ enum class OP {
     JG,
     JE,
     JMP,
+    /* label */
+    LABEL,
     /* memory */
     INT,    // create a int variable
     LOAD,
@@ -51,8 +55,11 @@ class Assembler {
 private:
     std::string asmcode;
     std::map<std::string, std::pair<OP, int>> opList;
+    std::vector<Instruction> instructions;
 
-    std::vector<Instruction> code;
+    bool init();
+    bool redirect();
+    bool interpret();
 public:
     Assembler(const std::string &code) : asmcode(code) {
         this->opList = {
@@ -62,6 +69,8 @@ public:
             {"SUB", {OP::SUB, 0}}, 
             {"MUL", {OP::MUL, 0}}, 
             {"DIV", {OP::DIV, 0}}, 
+            {"GT", {OP::GT, 0}}, 
+            {"LT", {OP::LT, 0}}, 
             {"DUP", {OP::DUP, 0}}, 
             {"POP", {OP::POP, 0}}, 
             {"PUSH", {OP::PUSH, 1}},
@@ -84,13 +93,12 @@ public:
     ~Assembler() {}
     
     bool assemble();
-    bool readCode();
 
     void print() {
-        for (int i = 0; i != code.size(); ++i) {
-            std::cout<<code[i].opName;
-            for (int j = 0; j != code[i].args.size(); ++j) {
-                std::cout<<" "<<code[i].args[j];
+        for (int i = 0; i != instructions.size(); ++i) {
+            std::cout<<instructions[i].opName;
+            for (int j = 0; j != instructions[i].args.size(); ++j) {
+                std::cout<<" "<<instructions[i].args[j];
             }
             std::cout<<std::endl;
         }
