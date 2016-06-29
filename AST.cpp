@@ -105,6 +105,15 @@ std::string BinaryExprAST::eval() {
             str += RHS->eval() + "SAVE " + LHS->eval().substr(5);
             break;
         }
+        case '>': {
+            str += LHS->eval() + RHS->eval() + "GT ";
+            std::cout<<str<<std::endl;
+            break;
+        }
+        case '<': {
+            str += LHS->eval() + RHS->eval() + "LT ";
+            break;
+        }
         // case ',': {
         //     str = LHS->eval() , RHS->eval();
         //     break;
