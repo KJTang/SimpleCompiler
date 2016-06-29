@@ -27,14 +27,19 @@ LOAD b
 ADD
 PUSH 1
 GT
-JZ L0
+JZ 34
 LOAD a
 LOAD b
 CALL add
 CALL print
-L0:
 LOAD a
 CALL print
 PUSH 0
 RET
 ENDF
+CALL main
+EXIT
+---- redirect ----
+Label: L0 34
+Func: add 12
+Func: main 18

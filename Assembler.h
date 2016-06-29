@@ -56,9 +56,12 @@ private:
     std::string asmcode;
     std::map<std::string, std::pair<OP, int>> opList;
     std::vector<Instruction> instructions;
+    int line = 0;
+    std::map<std::string, int> labelMap;
+    std::map<std::string, int> funcMap;
 
     bool init();
-    bool redirect();
+    bool redirect();    // redirect labels and functions
     bool interpret();
 public:
     Assembler(const std::string &code) : asmcode(code) {
@@ -101,6 +104,13 @@ public:
                 std::cout<<" "<<instructions[i].args[j];
             }
             std::cout<<std::endl;
+        }
+        std::cout<<"---- redirect ----"<<std::endl;
+        for (auto it = labelMap.begin(); it != labelMap.end(); ++it) {
+            std::cout<<"Label: "<<it->first<<" "<<it->second<<std::endl;
+        }
+        for (auto it = funcMap.begin(); it != funcMap.end(); ++it) {
+            std::cout<<"Func: "<<it->first<<" "<<it->second<<std::endl;
         }
     }
 };
