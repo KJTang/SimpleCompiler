@@ -2,9 +2,10 @@
 #include <sstream>
 #include <fstream>
 
-#include "VirtualMachine.h"
+// #include "VirtualMachine.h"
 #include "Lexer.h"
 #include "Parser.h"
+#include "Assembler.h"
 
 using namespace std;
 
@@ -31,8 +32,12 @@ int main(int argc, char *args[]) {
     Parser parser(lexer.getTokens());
     parser.parse();
     // parser.print();
-    std::cout<<"------------------ASM CODE------------------"<<std::endl;
-    std::cout<<parser.getAsmCode()<<"<<"<<std::endl;
+    // std::cout<<"------------------ASM CODE------------------"<<std::endl;
+    // std::cout<<parser.getAsmCode()<<"<<"<<std::endl;
+
+    Assembler assembler(parser.getAsmCode());
+    assembler.assemble();
+    assembler.print();
 
     return 0;
 }
