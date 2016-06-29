@@ -3,8 +3,6 @@
 #include <iostream>
 #include <stack>
 
-#include <cassert>
-
 // #define DEBUG
 
 bool Parser::parse() {
@@ -17,11 +15,13 @@ bool Parser::parse() {
         }
     }
     for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {
-        // asmcode += (*it)->eval();
-        // test
+        #ifdef DEBUG
         std::string temp = (*it)->eval();
         std::cout<<temp<<"<<"<<std::endl;
         asmcode += temp;
+        #else
+        asmcode += (*it)->eval();
+        #endif
     }
     return true;
 }
