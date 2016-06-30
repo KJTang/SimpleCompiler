@@ -9,13 +9,13 @@ ADD
 MUL
 SUB
 SAVE 0
-FUNC 12
+FUNC 20
 LOAD 1
 LOAD 2
 ADD
 RET
 ENDF
-FUNC 18
+FUNC 29
 INT 1
 PUSH 0
 SAVE 1
@@ -30,22 +30,22 @@ LOAD 2
 ADD
 PUSH 1
 GT
-JZ 37
+JZ 65
 LOAD 1
 LOAD 2
-CALL 12
+CALL 20
 SAVE 3
 LOAD 1
 SAVE 3
 PUSH 0
 RET
 ENDF
-CALL 18
+CALL 29
 EXIT
 ---- redirect ----
-Label: L0 37
-Func: add 12
-Func: main 18
+Label: L0 65
+Func: add 20
+Func: main 29
 Var: a 1
 Var: b 2
 Var: c 3

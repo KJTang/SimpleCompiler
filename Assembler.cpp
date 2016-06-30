@@ -34,6 +34,7 @@ bool Assembler::init() {
         for (int i = 0; i != (*it).second.second; i++) {
             iss>>arg;    
             newIns.args.push_back(arg);
+            ++line;
         }
         this->instructions.push_back(newIns);
         ++line;
