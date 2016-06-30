@@ -122,5 +122,6 @@ public:
         for (auto it = varMap.begin(); it != varMap.end(); ++it) {
             std::cout<<"Var: "<<it->first<<" "<<it->second<<std::endl;
         }
+        std::cout<<"------------------"<<std::endl;
     }
 };

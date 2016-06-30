@@ -2,10 +2,10 @@
 #include <sstream>
 #include <fstream>
 
-// #include "VirtualMachine.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "Assembler.h"
+#include "VirtualMachine.h"
 
 using namespace std;
 
@@ -38,7 +38,10 @@ int main(int argc, char *args[]) {
     Assembler assembler(parser.getAsmCode());
     assembler.assemble();
     assembler.print();
-    // std::cout<<assembler.getBinCode()<<std::endl;
+    std::cout<<assembler.getBinCode()<<std::endl<<"----------"<<std::endl;
 
+    VirtualMachine vm(assembler.getBinCode());
+    vm.execute();
+    // vm.print();
     return 0;
 }

@@ -1,206 +1,268 @@
 #include "VirtualMachine.h"
 
-bool VirtualMachine::readCode() {
-    std::istringstream iss(asmStr);
-    std::string curToken;
-    while (iss>>curToken) {
-        transform (curToken.begin(), curToken.end(), curToken.begin(), toupper);
-        auto it = this->opList.find(curToken);
-        if (it == opList.end()) {
-            // Invalid Operator
-            return false;
-        }
-        Instruction newIns;
-        newIns.opName = curToken;
-        newIns.op = (*it).second.first;
-        std::string arg;
-        for (int i = 0; i != (*it).second.second; i++) {
-            iss>>arg;    
-            newIns.args.push_back(arg);
-        }
-        this->code.push_back(newIns);
+#include <sstream>
+#include <cstring>
+
+VirtualMachine::VirtualMachine(const std::string &code) {
+    std::istringstream iss(code);
+    int num = 0;
+    while (iss>>num) {
+        this->binCode.push_back(num);
     }
-    return true;
+    int *global = new int[DATA_SEG_SIZE];
+    this->data.push_back(global);
+    bool *globalFlag = new bool[DATA_SEG_SIZE];
+    memset(globalFlag, false, DATA_SEG_SIZE);
+    this->dataFlag.push_back(globalFlag);
 }
 
-bool VirtualMachine::outputCode() {
-    int i = 0;
-    for (auto it = this->code.begin(); it != this->code.end(); ++it) {
-        std::cout<<i++<<"\t"<<(*it).opName;
-        for (auto arg = (*it).args.begin(); arg != (*it).args.end(); ++arg) {
-            std::cout<<" "<<(*arg);
+void VirtualMachine::printStack() {
+    if (!this->stack.empty()) {
+        std::cout<<"stack top: "<<this->stack.top()<<std::endl;
+    } else {
+        std::cout<<"stack top: none"<<std::endl;
+    }
+}
+
+void VirtualMachine::printData() {
+    for (int i = 0; i != eipStack.size()+1; ++i) {
+        std::cout<<"data stack "<<i<<": ";
+        for (int j = 0; j != 5; ++j) {
+            std::cout<<data[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
-    return true;
 }
 
-bool VirtualMachine::execCode() {
-    auto curIns = this->code.begin();
+bool VirtualMachine::execute() {
+    getNextWord();
     while (true) {
-        std::cout<<curIns - this->code.begin()<<std::endl;
-        switch (curIns->op) {
-            case OP::EXIT: {
+        switch (curWord) {
+            case (int)OP::EXIT: {
+                std::cout<<"-- exit"<<std::endl;
+                // while (!this->data.empty()) {
+                //     delete this->data.back();
+                //     delete this->dataFlag.back();
+                //     this->data.pop_back();
+                //     this->dataFlag.pop_back();
+                // }
                 return true;
             }
-            case OP::NOP: {
+            case (int)OP::NOP: {
+                std::cout<<"-- nop"<<std::endl;
+                getNextWord();
                 break;
             }
-            case OP::STACK_TOP: {
-                if (!this->stack.empty()) {
-                    std::cout<<"Top: "<<this->stack.top()<<std::endl;
-                } else {
-                    std::cout<<"Top: stack is empty"<<std::endl;
-                }
-                break;
-            }
-            case OP::ADD: {
+            case (int)OP::ADD: {
+                std::cout<<"-- add"<<std::endl;
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
                 this->stack.pop();
                 this->stack.push(a+b);
+                getNextWord();
                 break;
             }
-            case OP::SUB: {
+            case (int)OP::SUB: {
+                std::cout<<"-- sub"<<std::endl;
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
                 this->stack.pop();
                 this->stack.push(b-a);
+                getNextWord();
                 break;
             }
-            case OP::MUL: {
+            case (int)OP::MUL: {
+                std::cout<<"-- mul"<<std::endl;
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
                 this->stack.pop();
                 this->stack.push(a*b);
+                getNextWord();
                 break;
             }
-            case OP::DIV: {
+            case (int)OP::DIV: {
+                std::cout<<"-- div"<<std::endl;
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
                 this->stack.pop();
                 this->stack.push(b/a);
+                getNextWord();
                 break;
             }
-            case OP::DUP: {
+            case (int)OP::GT: {
+                std::cout<<"-- gt"<<std::endl;
+                int a = this->stack.top();
+                this->stack.pop();
+                int b = this->stack.top();
+                this->stack.pop();
+                this->stack.push(b>a?1:0);
+                getNextWord();
+                break;
+            }
+            case (int)OP::LT: {
+                std::cout<<"-- lt"<<std::endl;
+                int a = this->stack.top();
+                this->stack.pop();
+                int b = this->stack.top();
+                this->stack.pop();
+                this->stack.push(b<a?1:0);
+                getNextWord();
+                break;
+            }
+            case (int)OP::DUP: {
+                std::cout<<"-- dup"<<std::endl;
                 this->stack.push(this->stack.top());
+                getNextWord();
                 break;
             }
-            case OP::POP: {
+            case (int)OP::POP: {
+                std::cout<<"-- pop"<<std::endl;
                 this->stack.pop();
+                getNextWord();
                 break;
             }
-            case OP::PUSH: {
-                this->stack.push(atoi(curIns->args[0].c_str()));
+            case (int)OP::PUSH: {
+                getNextWord();
+                std::cout<<"-- push "<<curWord<<std::endl;
+                this->stack.push(curWord);
+                getNextWord();
                 break;
             }
-            case OP::JLZ: {
-                int a = this->stack.top();
-                this->stack.pop();
-                if (a < 0) {
-                    int addr = atoi(curIns->args[0].c_str());
-                    curIns = this->code.begin() + addr - 1;
+            // case (int)OP::JLZ: {
+            //     int num = this->stack.top();
+            //     this->stack.pop();
+            //     int newEip = getNextWord();
+            //     if (num < 0) {
+            //         this->eip = newEip;
+            //     }
+            //     break;
+            // }
+            // case (int)OP::JGZ: {
+            //     int num = this->stack.top();
+            //     this->stack.pop();
+            //     int newEip = getNextWord();
+            //     if (num > 0) {
+            //         this->eip = newEip;
+            //     }
+            //     break;
+            // }
+            case (int)OP::JZ: {
+                getNextWord();
+                std::cout<<"-- jz "<<this->curWord<<std::endl;
+                this->eip = curWord;
+                getNextWord();
+                break;
+            }
+            // case (int)OP::JL: {
+            //     // TODO
+            //     break;
+            // }
+            // case (int)OP::JG: {
+            //     // TODO
+            //     break;
+            // }
+            // case (int)OP::JE: {
+            //     // TODO
+            //     break;
+            // }
+            // case (int)OP::JMP: {
+            //     this->eip = getNextWord();
+            //     break;
+            // }
+            case (int)OP::INT: {
+                getNextWord();
+                std::cout<<"-- int "<<this->curWord<<std::endl;
+                this->dataFlag[this->eipStack.size()][this->curWord] = true;
+                getNextWord();
+                break;
+            }
+            case (int)OP::LOAD: {
+                getNextWord();
+                std::cout<<"-- load "<<this->curWord<<std::endl;
+                int pos = this->eipStack.size();
+                while (pos != -1) {
+                    if (this->dataFlag[pos][this->curWord]) {
+                        this->stack.push(this->data[pos][this->curWord]);
+                        getNextWord();
+                        break;
+                    } else {
+                        --pos;
+                    }    
+                }
+                if (pos == -1) {
+                    std::cout<<"variable "<<this->curWord<<" not found"<<std::endl;
+                    return false;
                 }
                 break;
             }
-            case OP::JGZ: {
-                int a = this->stack.top();
-                this->stack.pop();
-                if (a > 0) {
-                    int addr = atoi(curIns->args[0].c_str());
-                    curIns = this->code.begin() + addr - 1;
+            case (int)OP::SAVE: {
+                getNextWord();
+                std::cout<<"-- save "<<this->curWord<<std::endl;
+                int pos = this->eipStack.size();
+                while (pos != -1) {
+                    if (this->dataFlag[pos][this->curWord]) {
+                        this->data[pos][this->curWord] = this->stack.top();
+                        this->stack.pop();
+                        getNextWord();
+                        break;
+                    } else {
+                        --pos;
+                    }
+                }
+                if (pos == -1) {
+                    std::cout<<"variable not found"<<std::endl;
+                    return false;
                 }
                 break;
             }
-            case OP::JZ: {
-                int a = this->stack.top();
-                this->stack.pop();
-                if (a == 0) {
-                    int addr = atoi(curIns->args[0].c_str());
-                    curIns = this->code.begin() + addr - 1;
+            case (int)OP::CALL: {
+                getNextWord();
+                std::cout<<"-- call "<<this->curWord<<std::endl;
+                this->eipStack.push(this->eip);
+                this->eip = this->curWord;
+                int *local = new int[DATA_SEG_SIZE];
+                this->data.push_back(local);
+                bool *localFlag = new bool[DATA_SEG_SIZE];
+                memset(localFlag, false, DATA_SEG_SIZE);
+                this->dataFlag.push_back(localFlag);
+                getNextWord();
+                break;
+            }
+            case (int)OP::FUNC: {
+                getNextWord();
+                std::cout<<"-- func "<<this->curWord<<std::endl;
+                while (this->curWord != (int)OP::ENDF) {
+                    getNextWord();
                 }
                 break;
             }
-            case OP::JL: {
-                int a = this->stack.top();
-                this->stack.pop();
-                int b = this->stack.top();
-                this->stack.pop();
-                if (b < a) {
-                    int addr = atoi(curIns->args[0].c_str());
-                    curIns = this->code.begin() + addr - 1;
-                }
+            case (int)OP::RET: {
+                std::cout<<"-- ret "<<this->eipStack.top()<<std::endl;
+                this->eip = this->eipStack.top();
+                this->eipStack.pop();
+                getNextWord();
+                delete this->data.back();
+                delete this->dataFlag.back();
+                this->data.pop_back();
+                this->dataFlag.pop_back();
                 break;
             }
-            case OP::JG: {
-                int a = this->stack.top();
-                this->stack.pop();
-                int b = this->stack.top();
-                this->stack.pop();
-                if (b > a) {
-                    int addr = atoi(curIns->args[0].c_str());
-                    curIns = this->code.begin() + addr - 1;
-                }
-                break;
-            }
-            case OP::JE: {
-                int a = this->stack.top();
-                this->stack.pop();
-                int b = this->stack.top();
-                this->stack.pop();
-                if (b == a) {
-                    int addr = atoi(curIns->args[0].c_str());
-                    curIns = this->code.begin() + addr - 1;
-                }
-                break;
-            }
-            case OP::JMP: {
-                int addr = atoi(curIns->args[0].c_str());
-                curIns = this->code.begin() + addr - 1;
-                break;
-            }
-            case OP::LOAD: {
-                std::cout<<"load"<<std::endl;
-                int addr = atoi(curIns->args[0].c_str());
-                this->stack.push((*this->data.top())[addr]);
-                break;
-            }
-            case OP::SAVE: {
-                std::cout<<"save"<<std::endl;
-                int addr = atoi(curIns->args[0].c_str());
-                (*this->data.top())[addr] = this->stack.top();
-                this->stack.pop();
-                break;
-            }
-            case OP::CALL: {
-                std::cout<<"call"<<std::endl;
-                auto newLocaldata = new std::array<int, DATA_SEG_SIZE>();
-                this->data.push(newLocaldata);
-                int oldAddr = curIns - this->code.begin() + 1;
-                (*newLocaldata)[0] = oldAddr;
-                int newAddr = atoi(curIns->args[0].c_str());
-                curIns = this->code.begin() + newAddr - 1;
-                break;
-            }
-            case OP::RET: {
-                std::cout<<"ret"<<std::endl;
-                int oldAddr = (*this->data.top())[0];
-                curIns = this->code.begin() + oldAddr - 1;
-                delete this->data.top();
-                this->data.pop();
+            case (int)OP::ENDF: {
+                std::cout<<"-- endf"<<std::endl;
+                getNextWord();
                 break;
             }
             default: {
-                // Invalid Operator
-                std::cout<<"Invalid Operator: "<<curIns->opName<<std::endl;
+                std::cout<<"-- unknown: "<<this->curWord<<std::endl;
                 return false;
             }
         }
-        ++curIns;
+        this->printStack();
+        this->printData();
     }
     return true;
 }

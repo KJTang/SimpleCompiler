@@ -7,7 +7,8 @@ SRC =   main.cpp \
 		Lexer.cpp \
 		AST.cpp \
 		Parser.cpp \
-		Assembler.cpp 
+		Assembler.cpp  \
+		VirtualMachine.cpp
 
 # object files
 OBJS = $(SRC:.cpp=.o)
@@ -38,7 +39,6 @@ $(TARGET) : $(OBJS)
 
 -include $(OBJS:.o=.d)
 
-.PHONY : clean
-# clean
--clean:
-	rm $(TARGET) $(OBJS) *.d *.d.*
+.PHONY: clean
+clean:
+	-rm $(TARGET) *.o *.d *.d.*
