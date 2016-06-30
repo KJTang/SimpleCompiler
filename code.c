@@ -6,10 +6,11 @@ int add(int a, int b) {
 
 int main() {
     int a = 0, b = 1;
+    int c = 0;
     if (a + b > 1) {
-        print(add(a, b));
+        c = add(a, b);
     } else {
-        print(a);
+        c = a;
     }
     return 0;
 }

@@ -54,11 +54,15 @@ struct Instruction {
 class Assembler {
 private:
     std::string asmcode;
+    std::string binCode;
+
     std::map<std::string, std::pair<OP, int>> opList;
     std::vector<Instruction> instructions;
     int line = 0;
+    int varID = 0;
     std::map<std::string, int> labelMap;
     std::map<std::string, int> funcMap;
+    std::map<std::string, int> varMap;
 
     bool init();
     bool redirect();    // redirect labels and functions
@@ -96,6 +100,9 @@ public:
     ~Assembler() {}
     
     bool assemble();
+    std::string &getBinCode() {
+        return binCode;
+    }
 
     void print() {
         for (int i = 0; i != instructions.size(); ++i) {
@@ -111,6 +118,9 @@ public:
         }
         for (auto it = funcMap.begin(); it != funcMap.end(); ++it) {
             std::cout<<"Func: "<<it->first<<" "<<it->second<<std::endl;
+        }
+        for (auto it = varMap.begin(); it != varMap.end(); ++it) {
+            std::cout<<"Var: "<<it->first<<" "<<it->second<<std::endl;
         }
     }
 };

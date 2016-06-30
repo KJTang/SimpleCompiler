@@ -28,6 +28,17 @@ $(TARGET) : $(OBJS)
 # object file generate rule
 .cpp.o :
 	$(CC) $(INCLUDE_PATH) -c $< $(COMPILE_FLAGS)
+	
+# denpendency
+%.d:%.cpp
+	@set -e; \
+	rm -f $@; $(CC) -MM $< $(INCLUDEFLAGS) > $@.$$$$; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+	rm -f $@.$$$$
+
+-include $(OBJS:.o=.d)
+
+.PHONY : clean
 # clean
-clean:
-	rm $(TARGET) $(OBJS)
+-clean:
+	rm $(TARGET) $(OBJS) *.d *.d.*

@@ -1,4 +1,4 @@
-INT g
+INT 0
 PUSH 5
 PUSH 3
 PUSH 2
@@ -8,38 +8,45 @@ PUSH 3
 ADD
 MUL
 SUB
-SAVE g
-FUNC add
-LOAD a
-LOAD b
+SAVE 0
+FUNC 12
+LOAD 1
+LOAD 2
 ADD
 RET
 ENDF
-FUNC main
-INT a
+FUNC 18
+INT 1
 PUSH 0
-SAVE a
-INT b
+SAVE 1
+INT 2
 PUSH 1
-SAVE b
-LOAD a
-LOAD b
+SAVE 2
+INT 3
+PUSH 0
+SAVE 3
+LOAD 1
+LOAD 2
 ADD
 PUSH 1
 GT
-JZ 34
-LOAD a
-LOAD b
-CALL add
-CALL print
-LOAD a
-CALL print
+JZ 37
+LOAD 1
+LOAD 2
+CALL 12
+SAVE 3
+LOAD 1
+SAVE 3
 PUSH 0
 RET
 ENDF
-CALL main
+CALL 18
 EXIT
 ---- redirect ----
-Label: L0 34
+Label: L0 37
 Func: add 12
 Func: main 18
+Var: a 1
+Var: b 2
+Var: c 3
+Var: g 0

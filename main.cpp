@@ -38,6 +38,7 @@ int main(int argc, char *args[]) {
     Assembler assembler(parser.getAsmCode());
     assembler.assemble();
     assembler.print();
+    // std::cout<<assembler.getBinCode()<<std::endl;
 
     return 0;
 }
