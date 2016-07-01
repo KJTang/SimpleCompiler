@@ -41,8 +41,8 @@ bool VirtualMachine::execute() {
             case (int)OP::EXIT: {
                 // std::cout<<"-- exit"<<std::endl;
                 while (!this->data.empty()) {
-                    delete this->data.back();
-                    delete this->dataFlag.back();
+                    delete[] this->data.back();
+                    delete[] this->dataFlag.back();
                     this->data.pop_back();
                     this->dataFlag.pop_back();
                 }
@@ -247,8 +247,8 @@ bool VirtualMachine::execute() {
                 this->eip = this->eipStack.top();
                 this->eipStack.pop();
                 getNextWord();
-                delete this->data.back();
-                delete this->dataFlag.back();
+                delete[] this->data.back();
+                delete[] this->dataFlag.back();
                 this->data.pop_back();
                 this->dataFlag.pop_back();
                 break;
