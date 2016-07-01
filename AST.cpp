@@ -151,7 +151,7 @@ std::string WhileExprAST::eval() {
     std::string condLabel = generateJmpLabel();
     std::string quitLabel = generateJmpLabel();
     return condLabel + ":" + insEnd + condAST->eval() + "JZ " + quitLabel + insEnd + 
-        blockAST->eval() + quitLabel + ":" + insEnd;
+        blockAST->eval() + "JMP " + condLabel + insEnd + quitLabel + ":" + insEnd;
 }
 
 std::string CallFuncAST::eval() {
@@ -168,5 +168,19 @@ std::string ReturnAST::eval() {
 }
 
 std::string FunctionAST::eval() {
-    return "FUNC " + mFunc.second + insEnd + blockAST->eval() + "ENDF" + insEnd;
+    // std::cout<<"function: "<<mFunc.second<<"(";
+    // for (int i = 0; i != mArgs.size(); ++i) {
+    //     std::cout<<mArgs[i].second<<" ";
+    // }
+    // std::cout<<")"<<std::endl;
+    std::string argsStr;
+    for (auto it = mArgs.rbegin(); it != mArgs.rend(); ++it) {
+        // TODO: only "int" here, maybe more type in the future
+        if (it->first == Token::TYPE_INT) {
+            argsStr += "INT " + it->second + insEnd + "SAVE " + it->second + insEnd;
+        }
+    }
+    // std::cout<<"argsStr: "<<argsStr<<std::endl;
+    // std::cout<<"FUNC " + mFunc.second + insEnd + argsStr + blockAST->eval() + "ENDF" + insEnd<<std::endl;
+    return "FUNC " + mFunc.second + insEnd + argsStr + blockAST->eval() + "ENDF" + insEnd;
 }

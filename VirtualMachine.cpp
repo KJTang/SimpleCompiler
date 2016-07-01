@@ -27,7 +27,7 @@ void VirtualMachine::printStack() {
 void VirtualMachine::printData() {
     for (int i = 0; i != eipStack.size()+1; ++i) {
         std::cout<<"data stack "<<i<<": ";
-        for (int j = 0; j != 5; ++j) {
+        for (int j = 0; j != 10; ++j) {
             std::cout<<data[i][j]<<" ";
         }
         std::cout<<std::endl;
@@ -152,8 +152,11 @@ bool VirtualMachine::execute() {
             // }
             case (int)OP::JZ: {
                 getNextWord();
-                std::cout<<"-- jz "<<this->curWord<<std::endl;
-                this->eip = curWord;
+                std::cout<<"-- jz "<<this->curWord<<" "<<binCode[curWord]<<std::endl;
+                if (this->stack.top() == 0) {
+                    this->eip = curWord;
+                }
+                this->stack.pop();
                 getNextWord();
                 break;
             }
@@ -169,10 +172,13 @@ bool VirtualMachine::execute() {
             //     // TODO
             //     break;
             // }
-            // case (int)OP::JMP: {
-            //     this->eip = getNextWord();
-            //     break;
-            // }
+            case (int)OP::JMP: {
+                getNextWord();
+                std::cout<<"-- jmp "<<this->curWord<<std::endl;
+                this->eip = curWord;
+                getNextWord();
+                break;
+            }
             case (int)OP::INT: {
                 getNextWord();
                 std::cout<<"-- int "<<this->curWord<<std::endl;
