@@ -116,6 +116,22 @@ std::string BinaryExprAST::eval() {
             str += LHS->eval() + RHS->eval() + "LT" + insEnd;
             break;
         }
+        case (int)Token::OP_GTE: {
+            str += LHS->eval() + RHS->eval() + "GTE" + insEnd;
+            break;
+        }
+        case (int)Token::OP_LTE: {
+            str += LHS->eval() + RHS->eval() + "LTE" + insEnd;
+            break;
+        }
+        case (int)Token::OP_EQU: {
+            str += LHS->eval() + RHS->eval() + "EQU" + insEnd;
+            break;
+        }
+        case (int)Token::OP_NE: {
+            str += LHS->eval() + RHS->eval() + "NE" + insEnd;
+            break;
+        }
         // case ',': {
         //     str = LHS->eval() , RHS->eval();
         //     break;

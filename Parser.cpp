@@ -103,7 +103,7 @@ ASTNode *Parser::parseExpression() {
     std::cout<<curToken.second<<"\tparseExpression"<<std::endl;
     #endif
     std::stack<ASTNode*> numStack;
-    std::stack<char> opStack;
+    std::stack<int> opStack;
     while (true) {
         switch (curToken.first) {
             case Token::NUMBER: {
@@ -146,7 +146,7 @@ ASTNode *Parser::parseExpression() {
             default: {
                 // std::cout<<"op"<<std::endl;
                 if (!opStack.empty() && 
-                    getOperatorPrecedence(opStack.top()) >= getOperatorPrecedence(curToken.second[0])) {
+                    getOperatorPrecedence(opStack.top()) >= getOperatorPrecedence(static_cast<int>(curToken.first))) {
                     char op = opStack.top();
                     opStack.pop();
                     ASTNode *l, *r;
@@ -157,7 +157,7 @@ ASTNode *Parser::parseExpression() {
                     BinaryExprAST *binExpr = new BinaryExprAST(op, l, r);
                     numStack.push(binExpr);
                 }
-                opStack.push(curToken.second[0]);
+                opStack.push(static_cast<int>(curToken.first));
                 getNextToken();
                 break;
             }

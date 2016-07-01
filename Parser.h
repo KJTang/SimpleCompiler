@@ -22,16 +22,20 @@ private:
     }
 
     // operators(+ - / *) precedence
-    std::map<char, int> BinaryOperatorPrecedence = {
+    std::map<int, int> BinaryOperatorPrecedence = {
         {'=', 0}, 
         {'<', 1}, 
         {'>', 1}, 
+        {(int)Token::OP_GTE, 1}, 
+        {(int)Token::OP_LTE, 1}, 
+        {(int)Token::OP_EQU, 1}, 
+        {(int)Token::OP_NE, 1}, 
         {'+', 2}, 
         {'-', 2}, 
         {'*', 3}, 
         {'/', 3},
     };
-    int getOperatorPrecedence(char c) {
+    int getOperatorPrecedence(int c) {
         return BinaryOperatorPrecedence[c];
     }
 public:

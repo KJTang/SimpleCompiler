@@ -3,6 +3,8 @@
 #include <sstream>
 #include <cstring>
 
+// #define DEBUG
+
 VirtualMachine::VirtualMachine(const std::string &code) {
     std::istringstream iss(code);
     int num = 0;
@@ -39,7 +41,9 @@ bool VirtualMachine::execute() {
     while (true) {
         switch (curWord) {
             case (int)OP::EXIT: {
-                // std::cout<<"-- exit"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- exit"<<std::endl;
+                #endif
                 while (!this->data.empty()) {
                     delete[] this->data.back();
                     delete[] this->dataFlag.back();
@@ -49,12 +53,16 @@ bool VirtualMachine::execute() {
                 return true;
             }
             case (int)OP::NOP: {
-                // std::cout<<"-- nop"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- nop"<<std::endl;
+                #endif
                 getNextWord();
                 break;
             }
             case (int)OP::PRIT: {
-                // std::cout<<"-- prit"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- prit"<<std::endl;
+                #endif
                 std::cout<<this->stack.top()<<std::endl;
                 this->stack.pop();
                 getNextWord();
@@ -62,7 +70,9 @@ bool VirtualMachine::execute() {
             }
             case (int)OP::SCAN: {
                 getNextWord();
-                // std::cout<<"-- scan "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- scan "<<this->curWord<<std::endl;
+                #endif
                 int pos = this->eipStack.size();
                 while (pos != -1) {
                     if (this->dataFlag[pos][this->curWord]) {
@@ -74,13 +84,17 @@ bool VirtualMachine::execute() {
                     }
                 }
                 if (pos == -1) {
-                    // std::cout<<"variable not found"<<std::endl;
+                    #ifdef DEBUG
+                    std::cout<<"variable not found"<<std::endl;
+                    #endif
                     return false;
                 }
                 break;
             }
             case (int)OP::ADD: {
-                // std::cout<<"-- add"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- add"<<std::endl;
+                #endif
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
@@ -90,7 +104,9 @@ bool VirtualMachine::execute() {
                 break;
             }
             case (int)OP::SUB: {
-                // std::cout<<"-- sub"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- sub"<<std::endl;
+                #endif
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
@@ -100,7 +116,9 @@ bool VirtualMachine::execute() {
                 break;
             }
             case (int)OP::MUL: {
-                // std::cout<<"-- mul"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- mul"<<std::endl;
+                #endif
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
@@ -110,7 +128,9 @@ bool VirtualMachine::execute() {
                 break;
             }
             case (int)OP::DIV: {
-                // std::cout<<"-- div"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- div"<<std::endl;
+                #endif
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
@@ -120,7 +140,9 @@ bool VirtualMachine::execute() {
                 break;
             }
             case (int)OP::GT: {
-                // std::cout<<"-- gt"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- gt"<<std::endl;
+                #endif
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
@@ -130,7 +152,9 @@ bool VirtualMachine::execute() {
                 break;
             }
             case (int)OP::LT: {
-                // std::cout<<"-- lt"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- lt"<<std::endl;
+                #endif
                 int a = this->stack.top();
                 this->stack.pop();
                 int b = this->stack.top();
@@ -139,28 +163,84 @@ bool VirtualMachine::execute() {
                 getNextWord();
                 break;
             }
+            case (int)OP::GTE: {
+                #ifdef DEBUG
+                std::cout<<"-- gte"<<std::endl;
+                #endif
+                int a = this->stack.top();
+                this->stack.pop();
+                int b = this->stack.top();
+                this->stack.pop();
+                this->stack.push(b>=a?1:0);
+                getNextWord();
+                break;
+            }
+            case (int)OP::LTE: {
+                #ifdef DEBUG
+                std::cout<<"-- lte"<<std::endl;
+                #endif
+                int a = this->stack.top();
+                this->stack.pop();
+                int b = this->stack.top();
+                this->stack.pop();
+                this->stack.push(b<=a?1:0);
+                getNextWord();
+                break;
+            }
+            case (int)OP::EQU: {
+                #ifdef DEBUG
+                std::cout<<"-- gt"<<std::endl;
+                #endif
+                int a = this->stack.top();
+                this->stack.pop();
+                int b = this->stack.top();
+                this->stack.pop();
+                this->stack.push(b==a?1:0);
+                getNextWord();
+                break;
+            }
+            case (int)OP::NE: {
+                #ifdef DEBUG
+                std::cout<<"-- lt"<<std::endl;
+                #endif
+                int a = this->stack.top();
+                this->stack.pop();
+                int b = this->stack.top();
+                this->stack.pop();
+                this->stack.push(b!=a?1:0);
+                getNextWord();
+                break;
+            }
             case (int)OP::DUP: {
-                // std::cout<<"-- dup"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- dup"<<std::endl;
+                #endif
                 this->stack.push(this->stack.top());
                 getNextWord();
                 break;
             }
             case (int)OP::POP: {
-                // std::cout<<"-- pop"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- pop"<<std::endl;
+                #endif
                 this->stack.pop();
                 getNextWord();
                 break;
             }
             case (int)OP::PUSH: {
                 getNextWord();
-                // std::cout<<"-- push "<<curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- push "<<curWord<<std::endl;
+                #endif
                 this->stack.push(curWord);
                 getNextWord();
                 break;
             }
             case (int)OP::JZ: {
                 getNextWord();
-                // std::cout<<"-- jz "<<this->curWord<<" "<<binCode[curWord]<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- jz "<<this->curWord<<" "<<binCode[curWord]<<std::endl;
+                #endif
                 if (this->stack.top() == 0) {
                     this->eip = curWord;
                 }
@@ -170,21 +250,27 @@ bool VirtualMachine::execute() {
             }
             case (int)OP::JMP: {
                 getNextWord();
-                // std::cout<<"-- jmp "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- jmp "<<this->curWord<<std::endl;
+                #endif
                 this->eip = curWord;
                 getNextWord();
                 break;
             }
             case (int)OP::INT: {
                 getNextWord();
-                // std::cout<<"-- int "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- int "<<this->curWord<<std::endl;
+                #endif
                 this->dataFlag[this->eipStack.size()][this->curWord] = true;
                 getNextWord();
                 break;
             }
             case (int)OP::LOAD: {
                 getNextWord();
-                // std::cout<<"-- load "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- load "<<this->curWord<<std::endl;
+                #endif
                 int pos = this->eipStack.size();
                 while (pos != -1) {
                     if (this->dataFlag[pos][this->curWord]) {
@@ -196,14 +282,18 @@ bool VirtualMachine::execute() {
                     }    
                 }
                 if (pos == -1) {
-                    // std::cout<<"variable "<<this->curWord<<" not found"<<std::endl;
+                    #ifdef DEBUG
+                    std::cout<<"variable "<<this->curWord<<" not found"<<std::endl;
+                    #endif
                     return false;
                 }
                 break;
             }
             case (int)OP::SAVE: {
                 getNextWord();
-                // std::cout<<"-- save "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- save "<<this->curWord<<std::endl;
+                #endif
                 int pos = this->eipStack.size();
                 while (pos != -1) {
                     if (this->dataFlag[pos][this->curWord]) {
@@ -216,14 +306,18 @@ bool VirtualMachine::execute() {
                     }
                 }
                 if (pos == -1) {
-                    // std::cout<<"variable not found"<<std::endl;
+                    #ifdef DEBUG
+                    std::cout<<"variable not found"<<std::endl;
+                    #endif
                     return false;
                 }
                 break;
             }
             case (int)OP::CALL: {
                 getNextWord();
-                // std::cout<<"-- call "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- call "<<this->curWord<<std::endl;
+                #endif
                 this->eipStack.push(this->eip);
                 this->eip = this->curWord;
                 int *local = new int[DATA_SEG_SIZE];
@@ -236,14 +330,18 @@ bool VirtualMachine::execute() {
             }
             case (int)OP::FUNC: {
                 getNextWord();
-                // std::cout<<"-- func "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- func "<<this->curWord<<std::endl;
+                #endif
                 while (this->curWord != (int)OP::ENDF) {
                     getNextWord();
                 }
                 break;
             }
             case (int)OP::RET: {
-                // std::cout<<"-- ret "<<this->eipStack.top()<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- ret "<<this->eipStack.top()<<std::endl;
+                #endif
                 this->eip = this->eipStack.top();
                 this->eipStack.pop();
                 getNextWord();
@@ -254,17 +352,23 @@ bool VirtualMachine::execute() {
                 break;
             }
             case (int)OP::ENDF: {
-                // std::cout<<"-- endf"<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- endf"<<std::endl;
+                #endif
                 getNextWord();
                 break;
             }
             default: {
-                // std::cout<<"-- unknown: "<<this->curWord<<std::endl;
+                #ifdef DEBUG
+                std::cout<<"-- unknown: "<<this->curWord<<std::endl;
+                #endif
                 return false;
             }
         }
-        // this->printStack();
-        // this->printData();
+        #ifdef DEBUG
+        this->printStack();
+        this->printData();
+        #endif
     }
     return true;
 }

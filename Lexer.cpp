@@ -60,6 +60,38 @@ Token Lexer::lexToken() {
             tokens.push_back(std::make_pair(Token::END_OF_FILE, "\0"));
             return Token::END_OF_FILE;
         }
+        case '>': {
+            if (lexingStr[lexingPos] == '=') {
+                tokens.push_back(std::make_pair(Token::OP_GTE, ">="));
+                ++lexingPos;
+                return Token::OP_GTE;
+            }
+            goto ASCII;
+        }
+        case '<': {
+            if (lexingStr[lexingPos] == '=') {
+                tokens.push_back(std::make_pair(Token::OP_LTE, "<="));
+                ++lexingPos;
+                return Token::OP_LTE;
+            }
+            goto ASCII;
+        }
+        case '=': {
+            if (lexingStr[lexingPos] == '=') {
+                tokens.push_back(std::make_pair(Token::OP_EQU, "=="));
+                ++lexingPos;
+                return Token::OP_EQU;
+            }
+            goto ASCII;
+        }
+        case '!': {
+            if (lexingStr[lexingPos] == '=') {
+                tokens.push_back(std::make_pair(Token::OP_NE, "!="));
+                ++lexingPos;
+                return Token::OP_NE;
+            }
+            goto ASCII;
+        }
         // comment
         // def: start with "//", will comment one line
         case '/': {
@@ -75,9 +107,11 @@ Token Lexer::lexToken() {
                 }
             }
             // if not '//', jump to ascii
+            goto ASCII;
         }
         // ascii
         default: {
+            ASCII:
             tokens.push_back(std::make_pair((Token)curChar, std::string(1, curChar)));
             return (Token)curChar;
         }

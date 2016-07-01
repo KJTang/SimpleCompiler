@@ -7,7 +7,10 @@
 enum class Token : int {
     IDENTIFIER, 
     NUMBER, 
-    OPERATOR,           // operator: +-*/(){},;
+    OP_GTE,             // >=
+    OP_LTE,             // <=
+    OP_EQU,             // ==
+    OP_NE,              // !=
     KEYWORD_IF,         // if
     KEYWORD_ELSE,       // else
     KEYWORD_WHILE,      // while

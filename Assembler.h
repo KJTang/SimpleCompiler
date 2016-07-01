@@ -18,19 +18,18 @@ enum class OP {
     SUB,
     MUL,
     DIV,
-    GT, // greater than
-    LT, // less than
+    GT,     // greater than
+    LT,     // less than
+    GTE,    // greater than or equal to
+    LTE,    // less than or equal to
+    EQU,    // equal
+    NE,     // not equal
     /* stack */
     DUP,
     POP,
     PUSH,
     /* jump */
-    JLZ,
-    JGZ,
     JZ,
-    JL,
-    JG,
-    JE,
     JMP,
     /* label */
     LABEL,
@@ -80,15 +79,14 @@ public:
             {"DIV", {OP::DIV, 0}}, 
             {"GT", {OP::GT, 0}}, 
             {"LT", {OP::LT, 0}}, 
+            {"GTE", {OP::GT, 0}}, 
+            {"LTE", {OP::LT, 0}}, 
+            {"EQU", {OP::GT, 0}}, 
+            {"NE", {OP::LT, 0}}, 
             {"DUP", {OP::DUP, 0}}, 
             {"POP", {OP::POP, 0}}, 
             {"PUSH", {OP::PUSH, 1}},
-            {"JLZ", {OP::JLZ, 1}}, 
-            {"JGZ", {OP::JGZ, 1}}, 
             {"JZ", {OP::JZ, 1}}, 
-            {"JL", {OP::JL, 1}}, 
-            {"JG", {OP::JG, 1}}, 
-            {"JE", {OP::JE, 1}}, 
             {"JMP", {OP::JMP, 1}}, 
             {"INT", {OP::INT, 1}},
             {"LOAD", {OP::LOAD, 1}},

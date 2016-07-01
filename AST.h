@@ -63,10 +63,10 @@ public:
 /// BinaryExprAST - Expression class for a binary operator.
 class BinaryExprAST : public ASTNode {
 private:
-    char mOpr;
+    int mOpr;
     ASTNode *LHS, *RHS;
 public:
-    BinaryExprAST(char opr, ASTNode *lhs, ASTNode *rhs)
+    BinaryExprAST(int opr, ASTNode *lhs, ASTNode *rhs)
         : mOpr(opr), LHS(lhs), RHS(rhs) {}
     ~BinaryExprAST() {
         delete LHS;

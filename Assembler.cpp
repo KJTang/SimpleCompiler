@@ -50,7 +50,7 @@ bool Assembler::init() {
 bool Assembler::redirect() {
     for (auto it = this->instructions.begin(); it != this->instructions.end(); ++it) {
         // label
-        if (it->op >= OP::JLZ && it->op <= OP::JMP) {
+        if (it->op == OP::JZ || it->op == OP::JMP) {
             auto lableIt = this->labelMap.find(it->args[0]);
             std::ostringstream num;
             num<<lableIt->second;
