@@ -2,9 +2,9 @@ int fib(int n) {
     if (n <= 0) {
         return 0;
     }
-    int a = 0, b = 1;
+    int a = 1, b = 1;
     int result = 1;
-    while (n >= 2) {
+    while (n > 2) {
         result = a + b;
         a = b;
         b = result;
