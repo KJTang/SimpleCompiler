@@ -24,11 +24,12 @@ private:
         return curWord = binCode[eip++];
     }
 
+    // used to test
+    void printStack();
+    void printData();
 public:
     VirtualMachine(const std::string &code);
     ~VirtualMachine() {}
     
-    void printStack();
-    void printData();
     bool execute();
 };

@@ -40,12 +40,12 @@ bool VirtualMachine::execute() {
         switch (curWord) {
             case (int)OP::EXIT: {
                 // std::cout<<"-- exit"<<std::endl;
-                // while (!this->data.empty()) {
-                //     delete this->data.back();
-                //     delete this->dataFlag.back();
-                //     this->data.pop_back();
-                //     this->dataFlag.pop_back();
-                // }
+                while (!this->data.empty()) {
+                    delete this->data.back();
+                    delete this->dataFlag.back();
+                    this->data.pop_back();
+                    this->dataFlag.pop_back();
+                }
                 return true;
             }
             case (int)OP::NOP: {
@@ -158,24 +158,6 @@ bool VirtualMachine::execute() {
                 getNextWord();
                 break;
             }
-            // case (int)OP::JLZ: {
-            //     int num = this->stack.top();
-            //     this->stack.pop();
-            //     int newEip = getNextWord();
-            //     if (num < 0) {
-            //         this->eip = newEip;
-            //     }
-            //     break;
-            // }
-            // case (int)OP::JGZ: {
-            //     int num = this->stack.top();
-            //     this->stack.pop();
-            //     int newEip = getNextWord();
-            //     if (num > 0) {
-            //         this->eip = newEip;
-            //     }
-            //     break;
-            // }
             case (int)OP::JZ: {
                 getNextWord();
                 // std::cout<<"-- jz "<<this->curWord<<" "<<binCode[curWord]<<std::endl;
@@ -186,18 +168,6 @@ bool VirtualMachine::execute() {
                 getNextWord();
                 break;
             }
-            // case (int)OP::JL: {
-            //     // TODO
-            //     break;
-            // }
-            // case (int)OP::JG: {
-            //     // TODO
-            //     break;
-            // }
-            // case (int)OP::JE: {
-            //     // TODO
-            //     break;
-            // }
             case (int)OP::JMP: {
                 getNextWord();
                 // std::cout<<"-- jmp "<<this->curWord<<std::endl;

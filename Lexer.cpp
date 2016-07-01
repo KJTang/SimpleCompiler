@@ -55,11 +55,6 @@ Token Lexer::lexToken() {
         return Token::NUMBER;
     }
     switch (curChar) {
-        // // end of line
-        // case '\n': {
-        //     tokens.push_back(std::make_pair(Token::END_OF_LINE, "\\n"));
-        //     return Token::END_OF_LINE;
-        // }
         // end of file
         case '\0': {
             tokens.push_back(std::make_pair(Token::END_OF_FILE, "\0"));
@@ -99,11 +94,5 @@ bool Lexer::lex() {
         return true;
     } else {
         return false;
-    }
-}
-
-void Lexer::print() {
-    for (auto it = tokens.begin(); it != tokens.end(); ++it) {
-        std::cout<<"type: "<<(int)it->first<<";\tvalue: "<<it->second<<std::endl;
     }
 }

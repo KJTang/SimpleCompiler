@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -12,7 +13,6 @@ enum class Token : int {
     KEYWORD_WHILE,      // while
     KEYWORD_RET,        // return
     TYPE_INT,           // int
-    // END_OF_LINE, 
     END_OF_FILE = -1
 };
 
@@ -28,8 +28,15 @@ public:
     ~Lexer() {}
     
     bool lex();
-    void print();
     std::vector<std::pair<Token, std::string>> getTokens() {
         return tokens;
+    }
+
+    void debug() {
+        std::cout<<"-------- Lexer --------"<<std::endl;
+        for (auto it = tokens.begin(); it != tokens.end(); ++it) {
+            std::cout<<"type: "<<(int)it->first<<";\tvalue: "<<it->second<<std::endl;
+        }
+        std::cout<<"-----------------------"<<std::endl;
     }
 };

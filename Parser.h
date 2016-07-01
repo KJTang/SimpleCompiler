@@ -64,13 +64,17 @@ public:
     ASTNode *parseFuncDeclaration();
     // <VarDeclaration> ::= <Type> <Identifier> {"=" <Expression>} {"," <Identifier> {"=" <Expression>}} ";" 
     ASTNode *parseVarDeclaration();
-    // 
+    // <FuncReturn> ::= "return" <Expression>
     ASTNode *parseFuncReturn();
 
-    // test
-    void print();
     bool parse();
     std::string &getAsmCode() {
         return asmcode;
+    }
+
+    void debug() {
+        std::cout<<"-------- Parser --------"<<std::endl;
+        std::cout<<asmcode;
+        std::cout<<"------------------------"<<std::endl;
     }
 };

@@ -106,7 +106,9 @@ public:
         return binCode;
     }
 
-    void print() {
+    void debug() {
+        std::cout<<"-------- Assembler --------"<<std::endl;
+        std::cout<<"-- redirect assemble code --"<<std::endl;
         for (int i = 0; i != instructions.size(); ++i) {
             std::cout<<instructions[i].opName;
             for (int j = 0; j != instructions[i].args.size(); ++j) {
@@ -114,7 +116,7 @@ public:
             }
             std::cout<<std::endl;
         }
-        std::cout<<"---- redirect ----"<<std::endl;
+        std::cout<<"-- redirect symbols --"<<std::endl;
         for (auto it = labelMap.begin(); it != labelMap.end(); ++it) {
             std::cout<<"Label: "<<it->first<<" "<<it->second<<std::endl;
         }
@@ -124,6 +126,8 @@ public:
         for (auto it = varMap.begin(); it != varMap.end(); ++it) {
             std::cout<<"Var: "<<it->first<<" "<<it->second<<std::endl;
         }
-        std::cout<<"------------------"<<std::endl;
+        std::cout<<"-- binary code --"<<std::endl;
+        std::cout<<binCode<<std::endl;
+        std::cout<<"---------------------------"<<std::endl;
     }
 };

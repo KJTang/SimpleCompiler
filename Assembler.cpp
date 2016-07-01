@@ -15,11 +15,6 @@ bool Assembler::init() {
         if (it == opList.end()) {
             // Label
             if (curToken[curToken.size()-1] == ':') {
-                // Instruction label;
-                // label.opName = "LABEL";
-                // label.op = OP::LABEL;
-                // label.args.push_back(curToken.substr(0, curToken.size()-1));
-                // this->instructions.push_back(label);
                 this->labelMap.insert(std::make_pair(curToken.substr(0, curToken.size()-1), line));
                 continue;
             }

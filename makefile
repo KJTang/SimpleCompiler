@@ -17,7 +17,7 @@ COMPILE_FLAGS = -std=c++11 -ggdb
 # include files
 INCLUDE_PATH = 
 # library 
-LINKER_FLAGS = -std=c++11
+LINKER_FLAGS = -std=c++11 -ggdb
 
 all : $(TARGET)
 # target file generate rule

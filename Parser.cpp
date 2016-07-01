@@ -296,11 +296,3 @@ ASTNode *Parser::parseFuncReturn() {
     }
     return new ReturnAST(retExpr);
 }
-
-void Parser::print() {
-    for (auto it = ASTList.begin(); it != ASTList.end(); ++it) {
-        std::cout<<"Expr Start ---"<<std::endl;
-        (*it)->print();
-        std::cout<<"Expr End   ---"<<std::endl;
-    }
-}
