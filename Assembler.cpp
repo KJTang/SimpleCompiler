@@ -83,7 +83,7 @@ bool Assembler::redirect() {
             std::ostringstream num;
             num<<varIt->second;
             it->args[0] = num.str();
-        } else if (it->op == OP::SAVE || it->op == OP::LOAD) {
+        } else if (it->op == OP::SAVE || it->op == OP::LOAD || it->op == OP::SCAN) {
             auto varIt = this->varMap.find(it->args[0]);
             if (varIt == this->varMap.end()) {
                 std::cout<<"cannot find variable: "<<it->args[0]<<std::endl;

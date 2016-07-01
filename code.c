@@ -11,6 +11,9 @@ int fib(int n) {
 }
 
 int main() {
-    int num = fib(6);
-    return num;
+    int n = 0;
+    input(n);
+    int num = fib(n);
+    output(num);
+    return 0;
 }

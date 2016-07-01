@@ -34,11 +34,12 @@ int main(int argc, char *args[]) {
     // parser.print();
     // std::cout<<"------------------ASM CODE------------------"<<std::endl;
     // std::cout<<parser.getAsmCode()<<"<<"<<std::endl;
+    // std::cout<<"--------------------------------------------"<<std::endl;
 
     Assembler assembler(parser.getAsmCode());
     assembler.assemble();
-    assembler.print();
-    std::cout<<assembler.getBinCode()<<std::endl<<"----------"<<std::endl;
+    // assembler.print();
+    // std::cout<<assembler.getBinCode()<<std::endl<<"----------"<<std::endl;
 
     VirtualMachine vm(assembler.getBinCode());
     vm.execute();

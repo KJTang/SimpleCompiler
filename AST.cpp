@@ -156,10 +156,16 @@ std::string WhileExprAST::eval() {
 
 std::string CallFuncAST::eval() {
     std::string str;
-    for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
-        str += (*it)->eval();
+    if (mCallee == "input") {   // system func "input(int)"
+        str += "SCAN " + mArgs[0]->eval().substr(5);
+    } else if (mCallee == "output") {   // system func "output(int)"
+        str += mArgs[0]->eval() + "PRIT" + insEnd;
+    } else {
+        for (auto it = mArgs.begin(); it != mArgs.end(); ++it) {
+            str += (*it)->eval();
+        }
+        str += "CALL " + mCallee + insEnd;
     }
-    str += "CALL " + mCallee + insEnd;
     return str;
 }
 
@@ -168,11 +174,6 @@ std::string ReturnAST::eval() {
 }
 
 std::string FunctionAST::eval() {
-    // std::cout<<"function: "<<mFunc.second<<"(";
-    // for (int i = 0; i != mArgs.size(); ++i) {
-    //     std::cout<<mArgs[i].second<<" ";
-    // }
-    // std::cout<<")"<<std::endl;
     std::string argsStr;
     for (auto it = mArgs.rbegin(); it != mArgs.rend(); ++it) {
         // TODO: only "int" here, maybe more type in the future
@@ -180,7 +181,5 @@ std::string FunctionAST::eval() {
             argsStr += "INT " + it->second + insEnd + "SAVE " + it->second + insEnd;
         }
     }
-    // std::cout<<"argsStr: "<<argsStr<<std::endl;
-    // std::cout<<"FUNC " + mFunc.second + insEnd + argsStr + blockAST->eval() + "ENDF" + insEnd<<std::endl;
     return "FUNC " + mFunc.second + insEnd + argsStr + blockAST->eval() + "ENDF" + insEnd;
 }

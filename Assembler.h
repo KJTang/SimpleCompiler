@@ -72,6 +72,8 @@ public:
         this->opList = {
             {"EXIT", {OP::EXIT, 0}}, 
             {"NOP", {OP::NOP, 0}}, 
+            {"PRIT", {OP::PRIT, 0}}, 
+            {"SCAN", {OP::SCAN, 1}}, 
             {"ADD", {OP::ADD, 0}}, 
             {"SUB", {OP::SUB, 0}}, 
             {"MUL", {OP::MUL, 0}}, 
