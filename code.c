@@ -1,22 +1,36 @@
-int fib(int n) {
-    if (n <= 0) {
-        return 0;
+
+n = null;
+a = 0;
+b = 1.2;
+c = "test";
+
+d = [100];
+d[0] = a;
+d[1] = b;
+d[2] = c;
+d[3] = () {
+    //
+};
+d[4] = [5];
+d[4][0] = true;
+
+class e {
+    a = 0;
+    b = 1;
+    c = () {
+        print("1");
     }
-    int a = 1, b = 1;
-    int result = 1;
-    while (n > 2) {
-        result = a + b;
-        a = b;
-        b = result;
-        n = n - 1;
-    }
-    return result;
 }
 
-int main() {
-    int n = 0;
-    input(n);
-    int num = fib(n);
-    output(num);
-    return 0;
+class f : e {
+    c = () {
+        print("2");
+    }
 }
+
+main = () {
+    f1 = new f();
+    f1.c();
+}
+
+main();

@@ -2,32 +2,34 @@
 #include <sstream>
 #include <fstream>
 
-#include "Lexer.h"
-#include "Parser.h"
-#include "Assembler.h"
-#include "VirtualMachine.h"
+#include "lexer.h"
+#include "parser.h"
 
 int main(int argc, char *args[]) {
+    Lexer lexer;
+    Parser parser;
+
     if (argc != 2) {
         std::cout<<"code file not given"<<std::endl;
         return 0;
     }
     std::ifstream fin(args[1]);
-    std::string str((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+    // compiler input & lexer input
+    std::string inputStr((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+    // lexer output & parser input
+    std::vector<std::pair<Token, std::string>> tokens;
+    // parser output
+    std::vector<ASTNode*> astnode_list;
+    // compiler output
+    std::string outputStr;
 
-    Lexer lexer(str);
-    lexer.lex();
-    // lexer.debug();
+    lexer.Input(inputStr);
+    lexer.Lex();
+    lexer.Output(tokens);
 
-    Parser parser(lexer.getTokens());
-    parser.parse();
-    // parser.debug();
+    parser.Input(tokens);
+    parser.Parse();
+    parser.Output(astnode_list);
 
-    Assembler assembler(parser.getAsmCode());
-    assembler.assemble();
-    // assembler.debug();
-
-    VirtualMachine vm(assembler.getBinCode());
-    vm.execute();
     return 0;
 }

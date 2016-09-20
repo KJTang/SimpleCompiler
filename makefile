@@ -4,11 +4,9 @@ TARGET = a.out
 CC = g++
 # files
 SRC =   main.cpp \
-		Lexer.cpp \
-		AST.cpp \
-		Parser.cpp \
-		Assembler.cpp  \
-		VirtualMachine.cpp
+		astnode.cpp \
+		lexer.cpp \
+		parser.cpp
 
 # object files
 OBJS = $(SRC:.cpp=.o)
