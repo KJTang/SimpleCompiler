@@ -131,82 +131,82 @@ Token Lexer::LexToken() {
 }
 
 Token Lexer::LexIdentifier() {
-    std::string identifierName;
+    std::string identifier_name;
     cur_char_ = raw_str_[pos_-1];
 
-    identifierName += cur_char_;
+    identifier_name += cur_char_;
     cur_char_ = raw_str_[pos_++];
     while (isalnum(cur_char_) || cur_char_ == '_') {
-        identifierName += cur_char_;
+        identifier_name += cur_char_;
         cur_char_ = raw_str_[pos_++];
     }
     --pos_;
     // const null/bool
-    if (identifierName == "null") {
-        tokens_.push_back(std::make_pair(Token::CONST_NULL, identifierName));
+    if (identifier_name == "null") {
+        tokens_.push_back(std::make_pair(Token::CONST_NULL, identifier_name));
         return Token::CONST_NULL;
-    } else if (identifierName == "true") {
-        tokens_.push_back(std::make_pair(Token::CONST_BOOL, identifierName));
+    } else if (identifier_name == "true") {
+        tokens_.push_back(std::make_pair(Token::CONST_BOOL, identifier_name));
         return Token::CONST_BOOL;
-    } else if (identifierName == "false") {
-        tokens_.push_back(std::make_pair(Token::CONST_BOOL, identifierName));
+    } else if (identifier_name == "false") {
+        tokens_.push_back(std::make_pair(Token::CONST_BOOL, identifier_name));
         return Token::CONST_BOOL;
     }
     // keywords
     // def: class | if | else | while | return
-    else if (identifierName == "class") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_CLASS, identifierName));
+    else if (identifier_name == "class") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_CLASS, identifier_name));
         return Token::KEYWORD_CLASS;
-    } else if (identifierName == "if") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_IF, identifierName));
+    } else if (identifier_name == "if") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_IF, identifier_name));
         return Token::KEYWORD_IF;
-    } else if (identifierName == "else") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_ELSE, identifierName));
+    } else if (identifier_name == "else") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_ELSE, identifier_name));
         return Token::KEYWORD_ELSE;
-    } else if (identifierName == "while") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_WHILE, identifierName));
+    } else if (identifier_name == "while") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_WHILE, identifier_name));
         return Token::KEYWORD_WHILE;
-    } else if (identifierName == "return") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_RET, identifierName));
+    } else if (identifier_name == "return") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_RET, identifier_name));
         return Token::KEYWORD_RET;
     }
-    tokens_.push_back(std::make_pair(Token::IDENTIFIER, identifierName));
+    tokens_.push_back(std::make_pair(Token::IDENTIFIER, identifier_name));
     return Token::IDENTIFIER;
 }
 
 Token Lexer::LexNumber() {
-    std::string constStr;
+    std::string const_str;
     cur_char_ = raw_str_[pos_-1];
 
-    constStr += cur_char_;
+    const_str += cur_char_;
     cur_char_ = raw_str_[pos_++];
-    bool isInt = true;
+    bool is_int = true;
     while (isdigit(cur_char_) || cur_char_ == '.') {
         if (cur_char_ == '.') {
-            isInt = false;
+            is_int = false;
         }
-        constStr += cur_char_;
+        const_str += cur_char_;
         cur_char_ = raw_str_[pos_++];
     }
     --pos_;
-    if (isInt) {
-        tokens_.push_back(std::make_pair(Token::CONST_INT, constStr));
+    if (is_int) {
+        tokens_.push_back(std::make_pair(Token::CONST_INT, const_str));
         return Token::CONST_INT;
     } else {
-        tokens_.push_back(std::make_pair(Token::CONST_DOUBLE, constStr));
+        tokens_.push_back(std::make_pair(Token::CONST_DOUBLE, const_str));
         return Token::CONST_DOUBLE;
     }
 }
 
 Token Lexer::LexString() {
-    std::string constStr;
+    std::string const_str;
     cur_char_ = raw_str_[pos_-1];
 
     cur_char_ = raw_str_[pos_++];
     while (cur_char_ != '\"') {
-        constStr += cur_char_;
+        const_str += cur_char_;
         cur_char_ = raw_str_[pos_++];
     }
-    tokens_.push_back(std::make_pair(Token::CONST_STRING, constStr));
+    tokens_.push_back(std::make_pair(Token::CONST_STRING, const_str));
     return Token::CONST_STRING;
 }
