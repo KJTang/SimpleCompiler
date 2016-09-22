@@ -78,11 +78,63 @@ ASTNode* Parser::ParseBlock() {
 }
 
 ASTNode* Parser::ParseIfExpression() {
-    return nullptr;
+    cur_token_= tokens_[pos_++];    // eat "if"
+    ASTNode* condition = ParseParenExpression();
+    if (!condition) {
+        // TODO: err
+        return nullptr;
+    }
+    
+    ASTNode* if_block = nullptr;
+    if (static_cast<int>(cur_token_.first) == '{') {
+        if_block = ParseBlock();
+    } else {
+        if_block = ParseStatement();
+    }
+    if (!if_block) {
+        // TODO: err
+        return nullptr;
+    }
+
+    ASTNode* else_block = nullptr;
+    if (cur_token_.first == Token::KEYWORD_ELSE) {
+        cur_token_ = tokens_[pos_++];   // eat "else"
+        if (static_cast<int>(cur_token_.first) == '{') {
+            else_block = ParseBlock();
+        } else {
+            else_block = ParseStatement();
+        }
+        if (!else_block) {
+            // TODO: err
+            return nullptr;
+        }
+    }
+
+    ASTNode* node = new ASTIfExpr(condition, if_block, else_block);
+    return node;
 }
 
 ASTNode* Parser::ParseWhileExpression() {
-    return nullptr;
+    cur_token_ = tokens_[pos_++];   // eat "while"
+    ASTNode* condition = ParseParenExpression();
+    if (!condition) {
+        // TODO: err
+        return nullptr;
+    }
+
+    ASTNode* block = nullptr;
+    if (static_cast<int>(cur_token_.first) == '{') {
+        block = ParseBlock();
+    } else {
+        block = ParseStatement();
+    }
+    if (!block) {
+        // TODO: err
+        return nullptr;
+    }
+
+    ASTNode* node = new ASTWhileExpr(condition, block);
+    return node;
 }
 
 ASTNode* Parser::ParseExpression() {

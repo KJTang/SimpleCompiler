@@ -234,3 +234,43 @@ public:
         block_->print();
     }  
 };
+
+class ASTIfExpr : public ASTNode {
+private:
+    ASTNode* condition_;
+    ASTNode* if_block_;
+    ASTNode* else_block_;
+public:
+    ASTIfExpr(ASTNode* condition, ASTNode* if_block, ASTNode* else_block) : condition_(condition), if_block_(if_block), else_block_(else_block) {
+        set_type(ASTTYPE::DEFAULT);
+    }
+    ~ASTIfExpr() {}
+    
+    // Test
+    virtual void print() {
+        std::cout<<"ASTIfExpr: \t"<<"if"<<std::endl;
+        condition_->print();
+        if_block_->print();
+        if (else_block_) {
+            else_block_->print();
+        }
+    }  
+};
+
+class ASTWhileExpr : public ASTNode {
+private:
+    ASTNode* condition_;
+    ASTNode* block_;
+public:
+    ASTWhileExpr(ASTNode* condition, ASTNode* block) : condition_(condition), block_(block) {
+        set_type(ASTTYPE::DEFAULT);
+    }
+    ~ASTWhileExpr() {}
+    
+    // Test
+    virtual void print() {
+        std::cout<<"ASTWhileExpr: \t"<<"while"<<std::endl;
+        condition_->print();
+        block_->print();
+    }  
+};

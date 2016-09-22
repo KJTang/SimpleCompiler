@@ -1,7 +1,16 @@
 
-func = function () {
-    arr = [(100 / a) - b + c(d)];
+if (a + 1) {
+    //
+    b = [100];
+} else {
+    while (true) {
+        c + 1;
+    }
 }
+
+// func = function () {
+//     arr = [(100 / a) - b + c(d)];
+// }
 
 
 // var = arr[0] + arr[1].func(1, b[1]*2/c.d, a = 1);
