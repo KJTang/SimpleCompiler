@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "lexer.h"
 
@@ -81,6 +82,26 @@ public:
         std::cout<<"ASTVarMember: \t"<<"."<<std::endl;
         var_->print();
         member_->print();
+    }
+};
+
+class ASTVarFunc : public ASTNode {
+private:
+    ASTNode* var_;
+    std::vector<ASTNode*> parameters_;
+public:
+    ASTVarFunc(ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
+        set_type(ASTTYPE::VARIABLE);
+    }
+    ~ASTVarFunc() {}
+
+    // Test
+    virtual void print() {
+        std::cout<<"ASTVarFunc: \t"<<"("<<parameters_.size()<<")"<<std::endl;
+        var_->print();
+        for (int i = 0; i != parameters_.size(); ++i) {
+            parameters_[i]->print();
+        }
     }
 };
 

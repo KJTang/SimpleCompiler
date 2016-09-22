@@ -200,16 +200,16 @@ ASTNode* Parser::ParseVariable() {
                 node = var_mem;
                 break;
             }
-            // case static_cast<Token>('('): {
-            //     ASTNode* var_func = ParseVarFunc(node);
-            //     if (!var_func) {
-            //         // TODO: err
-            //         err_occur_ = true;
-            //         return nullptr;
-            //     }
-            //     node = var_func;
-            //     break;
-            // }
+            case static_cast<Token>('('): {
+                ASTNode* var_func = ParseVarFunc(node);
+                if (!var_func) {
+                    // TODO: err
+                    err_occur_ = true;
+                    return nullptr;
+                }
+                node = var_func;
+                break;
+            }
             default: {
                 is_finished = true;
                 break;
@@ -244,5 +244,35 @@ ASTNode* Parser::ParseVarMember(ASTNode* var) {
         return nullptr;
     }
     ASTNode* node = new ASTVarMember(var, member);
+    return node;
+}
+
+ASTNode* Parser::ParseVarFunc(ASTNode* var) {
+    cur_token_ = tokens_[pos_++];   // eat '('
+    std::vector<ASTNode*> parameters;
+    if (static_cast<int>(cur_token_.first) == ')') {
+        cur_token_ = tokens_[pos_++];   // eat ')'
+    } else {
+        bool is_finished = false;
+        while (!is_finished) {
+            ASTNode* param = ParseExpression();
+            if (!param) {
+                // TODO: err
+                return nullptr;
+            }
+            parameters.push_back(param);
+
+            if (static_cast<int>(cur_token_.first) == ',') {
+                cur_token_ = tokens_[pos_++];   // eat ','
+            } else if (static_cast<int>(cur_token_.first) == ')') {
+                cur_token_ = tokens_[pos_++];   // eat ')'
+                is_finished = true;
+            } else {
+                // TODO: err
+                return nullptr;
+            }
+        }
+    }
+    ASTNode* node = new ASTVarFunc(var, parameters);
     return node;
 }

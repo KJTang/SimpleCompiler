@@ -45,6 +45,7 @@ private:
     ASTNode* ParseVariable();
     ASTNode* ParseVarArray(ASTNode* var);
     ASTNode* ParseVarMember(ASTNode* var);
+    ASTNode* ParseVarFunc(ASTNode* var);
 public:
     Parser();
     ~Parser();
