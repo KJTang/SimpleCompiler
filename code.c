@@ -1,12 +1,27 @@
 
-if (a + 1) {
-    //
-    b = [100];
-} else {
-    while (true) {
-        c + 1;
+class Parent {
+    a = 0;
+    f = function() {
+        b = 0;
     }
 }
+
+class Child : Parent {
+    f = function() {
+        c = 0;
+    }
+}
+
+a = new Child();
+
+// if (a + 1) {
+//     //
+//     b = [100];
+// } else {
+//     while (true) {
+//         c + 1;
+//     }
+// }
 
 // func = function () {
 //     arr = [(100 / a) - b + c(d)];

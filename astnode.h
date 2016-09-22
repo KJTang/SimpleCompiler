@@ -232,7 +232,49 @@ public:
             parameters_[i]->print();
         }
         block_->print();
-    }  
+    }
+};
+
+class ASTDefClass : public ASTNode {
+private:
+    ASTNode* self_;
+    ASTNode* parent_;
+    ASTNode* block_;
+public:
+    ASTDefClass(ASTNode* self, ASTNode* parent, ASTNode* block) : self_(self), parent_(parent), block_(block) {
+        set_type(ASTTYPE::DEFAULT);
+    }
+    ~ASTDefClass() {}
+
+    // Test
+    virtual void print() {
+        std::cout<<"ASTDefClass: \t"<<"def class"<<std::endl;
+        self_->print();
+        if (parent_) {
+            parent_->print();
+        }
+        block_->print();
+    }
+};
+
+class ASTNewClass : public ASTNode {
+private:
+    ASTNode* var_;
+    ASTNode* class_name_;
+    ASTNode* func_;
+public:
+    ASTNewClass(ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
+        set_type(ASTTYPE::VARIABLE);
+    }
+    ~ASTNewClass() {}
+    
+    // Test
+    virtual void print() {
+        std::cout<<"ASTNewClass: \t"<<"new class"<<std::endl;
+        var_->print();
+        class_name_->print();
+        func_->print();
+    }
 };
 
 class ASTIfExpr : public ASTNode {

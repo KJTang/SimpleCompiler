@@ -162,6 +162,9 @@ Token Lexer::LexIdentifier() {
     else if (identifier_name == "class") {
         tokens_.push_back(std::make_pair(Token::KEYWORD_CLASS, identifier_name));
         return Token::KEYWORD_CLASS;
+    } else if (identifier_name == "new") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_NEW, identifier_name));
+        return Token::KEYWORD_NEW;
     } else if (identifier_name == "if") {
         tokens_.push_back(std::make_pair(Token::KEYWORD_IF, identifier_name));
         return Token::KEYWORD_IF;

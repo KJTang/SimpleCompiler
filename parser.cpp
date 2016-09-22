@@ -43,6 +43,9 @@ ASTNode* Parser::ParseStatement() {
         case Token::KEYWORD_WHILE: {
             return ParseWhileExpression();
         }
+        case Token::KEYWORD_CLASS: {
+            return ParseDefClass();
+        }
         case static_cast<Token>(';'): {
             cur_token_ = tokens_[pos_++];
             return ParseStatement();
@@ -379,6 +382,28 @@ ASTNode* Parser::ParseVarFunc(ASTNode* var) {
     return node;
 }
 
+ASTNode* Parser::ParseNewClass(ASTNode* var) {
+    cur_token_ = tokens_[pos_++];   // eat "new"
+    if (cur_token_.first != Token::IDENTIFIER) {
+        // TODO: err
+        return nullptr;
+    }
+    ASTNode* class_name = new ASTVariable(cur_token_.second);
+    cur_token_ = tokens_[pos_++];
+    if (static_cast<int>(cur_token_.first) != '(') {
+        // TODO: err
+        return nullptr;
+    }
+    ASTNode* func = ParseVarFunc(class_name);
+    if (!func) {
+        // TODO: err
+        return nullptr;
+    }
+
+    ASTNode* node = new ASTNewClass(var, class_name, func);
+    return node;
+}
+
 ASTNode* Parser::ParseAssignment(ASTNode* var) {
     cur_token_ = tokens_[pos_++];   // eat '='
     ASTNode* node = nullptr;
@@ -386,6 +411,8 @@ ASTNode* Parser::ParseAssignment(ASTNode* var) {
         node = ParseDefArray(var);
     } else if (cur_token_.first == Token::KEYWORD_FUNCTION) {
         node = ParseDefFunc(var);
+    } else if (cur_token_.first == Token::KEYWORD_NEW) {
+        node = ParseNewClass(var);
     } else {
         ASTNode* expr = ParseExpression();
         node = new ASTAssign(var, expr);
@@ -447,5 +474,41 @@ ASTNode* Parser::ParseDefFunc(ASTNode* var) {
     }
     ASTNode* block = ParseBlock();
     ASTNode* node = new ASTDefFunc(var, parameters, block);
+    return node;
+}
+
+ASTNode* Parser::ParseDefClass() {
+    cur_token_ = tokens_[pos_++];   // eat "class"
+    if (cur_token_.first != Token::IDENTIFIER) {
+        // TODO: err
+        return nullptr;
+    }
+    
+    ASTNode* self = new ASTVariable(cur_token_.second);
+    cur_token_ = tokens_[pos_++];
+
+    ASTNode* parent = nullptr;
+    if (static_cast<int>(cur_token_.first) == ':') {
+        cur_token_ = tokens_[pos_++];   // eat ':'
+        if (cur_token_.first != Token::IDENTIFIER) {
+            // TODO: err
+            return nullptr;
+        }
+        parent = new ASTVariable(cur_token_.second);
+        cur_token_ = tokens_[pos_++];
+    }
+
+    ASTNode* block = nullptr;
+    if (static_cast<int>(cur_token_.first) != '{') {
+        // TODO: err
+        return nullptr;
+    }
+    block = ParseBlock();
+    if (!block) {
+        // TODO: err
+        return nullptr;
+    }
+
+    ASTNode* node = new ASTDefClass(self, parent, block);
     return node;
 }

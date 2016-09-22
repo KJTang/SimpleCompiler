@@ -22,6 +22,7 @@ enum class Token : int {
     OP_OR,              // ||
 
     KEYWORD_CLASS,      // class
+    KEYWORD_NEW,        // new
     KEYWORD_IF,         // if
     KEYWORD_ELSE,       // else
     KEYWORD_WHILE,      // while
