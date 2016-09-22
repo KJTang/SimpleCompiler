@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+#include "err_handler.h"
+
 enum class Token : int {
     IDENTIFIER = 256, 
 
@@ -11,7 +13,6 @@ enum class Token : int {
     CONST_INT,          // const int: 123
     CONST_DOUBLE,       // const double: 1.23
     CONST_STRING,       // const string: "str"
-    CONST_ARRAY,        // const array: arr[100]
 
     OP_GTE,             // >=
     OP_LTE,             // <=
@@ -38,6 +39,7 @@ private:
 
     char cur_char_;
     int pos_ = 0;
+    bool err_occur_ = false;
 
     Token LexToken();
 

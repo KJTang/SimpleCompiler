@@ -26,7 +26,12 @@ bool Lexer::Lex() {
     do {
         result = this->LexToken();
     } while (result != Token::END_OF_FILE);
-    return true;
+
+    if (err_occur_) {
+        return false;
+    } else {
+        return true;
+    }
 }
 
 Token Lexer::LexToken() {
@@ -200,10 +205,14 @@ Token Lexer::LexNumber() {
 
 Token Lexer::LexString() {
     std::string const_str;
-    cur_char_ = raw_str_[pos_-1];
 
     cur_char_ = raw_str_[pos_++];
     while (cur_char_ != '\"') {
+        if (pos_ >= raw_str_.size()) {
+            err_occur_ = true;
+            ErrorHandler::GetInstance()->ThrowError("Missing \"");
+            return Token::END_OF_FILE;
+        }
         const_str += cur_char_;
         cur_char_ = raw_str_[pos_++];
     }

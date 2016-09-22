@@ -4,6 +4,7 @@ TARGET = a.out
 CC = g++
 # files
 SRC =   main.cpp \
+		err_handler.cpp \
 		astnode.cpp \
 		lexer.cpp \
 		parser.cpp
