@@ -1,5 +1,10 @@
 
-arr[0] + arr[1].func(1, b[1]*2/c.d, "(){a = 1;}");
+func = function () {
+    arr = [(100 / a) - b + c(d)];
+}
+
+
+// var = arr[0] + arr[1].func(1, b[1]*2/c.d, a = 1);
 
 // n.a[0] + 5 / (1 - n.a[100-99]) * n.a[2].b;
 

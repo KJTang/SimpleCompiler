@@ -25,14 +25,32 @@ public:
     ASTNode() {}
     ~ASTNode() {}
 
-    void set_type(ASTTYPE type) {type_ = type;}
-    ASTTYPE get_type() {return type_;}
+    void set_type(ASTTYPE type) { type_ = type; }
+    ASTTYPE get_type() { return type_; }
 
-    void set_value(const std::string& value) {value_ = value;}
-    std::string get_value() {return value_;}
+    void set_value(const std::string& value) { value_ = value; }
+    std::string get_value() { return value_; }
 
     // Test
     virtual void print() {}
+};
+
+class ASTBlock : public ASTNode {
+private:
+    std::vector<ASTNode*> statements_;
+public:
+    ASTBlock(const std::vector<ASTNode*>& statments) : statements_(statments) {
+        set_type(ASTTYPE::DEFAULT);
+    }
+    ~ASTBlock() {}
+
+    // Test
+    virtual void print() {
+        std::cout<<"ASTBlock: \t"<<"{"<<statements_.size()<<"}"<<std::endl;
+        for (int i = 0; i != statements_.size(); ++i) {
+            statements_[i]->print();
+        }
+    }
 };
 
 class ASTVariable : public ASTNode {
@@ -157,4 +175,62 @@ public:
         l_node_->print();
         r_node_->print();
     }
+};
+
+class ASTAssign : public ASTNode {
+private:
+    ASTNode* l_node_;
+    ASTNode* r_node_;
+public:
+    ASTAssign(ASTNode* l_node, ASTNode* r_node) : l_node_(l_node), r_node_(r_node) {
+        set_type(ASTTYPE::VARIABLE);
+    }
+    ~ASTAssign() {}
+
+    // Test
+    virtual void print() {
+        std::cout<<"ASTAssign: \t"<<"="<<std::endl;
+        l_node_->print();
+        r_node_->print();
+    }
+};
+
+class ASTDefArray : public ASTNode {
+private:
+    ASTNode* var_;
+    ASTNode* size_;
+public:
+    ASTDefArray(ASTNode* var, ASTNode* size) : var_(var), size_(size) {
+        set_type(ASTTYPE::VARIABLE);
+    }
+    ~ASTDefArray() {}
+  
+    // Test
+    virtual void print() {
+        std::cout<<"ASTDefArray: \t"<<"def []"<<std::endl;
+        var_->print();
+        size_->print();
+    }  
+};
+
+class ASTDefFunc : public ASTNode {
+private:
+    ASTNode* var_;
+    std::vector<ASTNode*> parameters_;
+    ASTNode* block_;
+public:
+    ASTDefFunc(ASTNode* var, const std::vector<ASTNode*>& parameters, ASTNode* block) : var_(var), parameters_(parameters), block_(block) {
+        set_type(ASTTYPE::VARIABLE);
+    }
+    ~ASTDefFunc() {}
+  
+    // Test
+    virtual void print() {
+        std::cout<<"ASTDefFunc: \t"<<"def ("<<parameters_.size()<<")"<<std::endl;
+        var_->print();
+        for (int i = 0; i != parameters_.size(); ++i) {
+            parameters_[i]->print();
+        }
+        block_->print();
+    }  
 };

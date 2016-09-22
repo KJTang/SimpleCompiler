@@ -53,6 +53,30 @@ ASTNode* Parser::ParseStatement() {
     }
 }
 
+ASTNode* Parser::ParseBlock() {
+    cur_token_ = tokens_[pos_++];   // eat '{'
+    std::vector<ASTNode*> statements;
+
+    if (static_cast<int>(cur_token_.first) == '}') {
+        cur_token_ = tokens_[pos_++];   // eat '}'
+    } else {
+        bool is_finished = false;
+        while (!is_finished) {
+            ASTNode* stat = ParseStatement();
+            if (stat) {
+                statements.push_back(stat);
+            }
+            if (static_cast<int>(cur_token_.first) == '}') {
+                is_finished = true;
+            }
+        }
+        cur_token_ = tokens_[pos_++];   // eat '}'
+    }
+
+    ASTNode* node = new ASTBlock(statements);
+    return node;
+}
+
 ASTNode* Parser::ParseIfExpression() {
     return nullptr;
 }
@@ -71,6 +95,28 @@ ASTNode* Parser::ParseExpression() {
 
     while (!is_finished) {
         switch (cur_token_.first) {
+            case static_cast<Token>('='): {
+                if (!is_token_var) {
+                    // TODO: err
+                    return nullptr;
+                }
+                while (!op_stack.empty()) {
+                    int op = op_stack.top();
+                    op_stack.pop();
+                    ASTNode* r_node = var_stack.top();
+                    var_stack.pop();
+                    ASTNode* l_node = var_stack.top();
+                    var_stack.pop();
+                    ASTBinaryOp* node = new ASTBinaryOp(op, l_node, r_node);
+                    var_stack.push(node);
+                }
+                if (!var_stack.empty()) {
+                    return ParseAssignment(var_stack.top());
+                } else {
+                    // TODO: err
+                    return nullptr;
+                }
+            }
             case static_cast<Token>('('): {
                 if (is_token_var) {
                     is_finished = true;
@@ -152,6 +198,10 @@ ASTNode* Parser::ParseExpression() {
 
 ASTNode* Parser::ParseParenExpression() {
     cur_token_ = tokens_[pos_++];   // eat '('
+    if (static_cast<int>(cur_token_.first) == ')') {
+        // TODO: err
+        return nullptr;
+    }
     ASTNode* expr = ParseExpression();
     if (!expr) {
         // TODO: err
@@ -274,5 +324,76 @@ ASTNode* Parser::ParseVarFunc(ASTNode* var) {
         }
     }
     ASTNode* node = new ASTVarFunc(var, parameters);
+    return node;
+}
+
+ASTNode* Parser::ParseAssignment(ASTNode* var) {
+    cur_token_ = tokens_[pos_++];   // eat '='
+    ASTNode* node = nullptr;
+    if (static_cast<int>(cur_token_.first) == '[') {
+        node = ParseDefArray(var);
+    } else if (cur_token_.first == Token::KEYWORD_FUNCTION) {
+        node = ParseDefFunc(var);
+    } else {
+        ASTNode* expr = ParseExpression();
+        node = new ASTAssign(var, expr);
+    }
+    return node;
+}
+
+ASTNode* Parser::ParseDefArray(ASTNode* var) {
+    cur_token_ = tokens_[pos_++];   // eat '['
+    ASTNode* size = ParseExpression();
+    if (!size) {
+        // TODO: err
+        return nullptr;
+    }
+    if (static_cast<int>(cur_token_.first) != ']') {
+        // TODO: err
+        return nullptr;
+    }
+    cur_token_ = tokens_[pos_++];   // eat ']'
+    ASTNode* node = new ASTDefArray(var, size);
+    return node;
+}
+
+ASTNode* Parser::ParseDefFunc(ASTNode* var) {
+    cur_token_ = tokens_[pos_++];   // eat "function"
+    if (static_cast<int>(cur_token_.first) != '(') {
+        // TODO: err
+        return nullptr;
+    }
+    
+    cur_token_ = tokens_[pos_++];   // eat '('
+    std::vector<ASTNode*> parameters;
+    if (static_cast<int>(cur_token_.first) == ')') {
+        cur_token_ = tokens_[pos_++];   // eat ')'
+    } else {
+        bool is_finished = false;
+        while (!is_finished) {
+            ASTNode* param = ParseExpression();
+            if (!param) {
+                // TODO: err
+                return nullptr;
+            }
+            parameters.push_back(param);
+
+            if (static_cast<int>(cur_token_.first) == ',') {
+                cur_token_ = tokens_[pos_++];   // eat ','
+            } else if (static_cast<int>(cur_token_.first) == ')') {
+                cur_token_ = tokens_[pos_++];   // eat ')'
+                is_finished = true;
+            } else {
+                // TODO: err
+                return nullptr;
+            }
+        }
+    }
+
+    if (static_cast<int>(cur_token_.first) != '{') {
+        // TODO: err
+    }
+    ASTNode* block = ParseBlock();
+    ASTNode* node = new ASTDefFunc(var, parameters, block);
     return node;
 }

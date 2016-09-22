@@ -36,6 +36,7 @@ private:
     bool err_occur_ = false;
 
     ASTNode* ParseStatement();
+    ASTNode* ParseBlock();
     ASTNode* ParseIfExpression();
     ASTNode* ParseWhileExpression();
     ASTNode* ParseExpression();
@@ -46,6 +47,9 @@ private:
     ASTNode* ParseVarArray(ASTNode* var);
     ASTNode* ParseVarMember(ASTNode* var);
     ASTNode* ParseVarFunc(ASTNode* var);
+    ASTNode* ParseAssignment(ASTNode* var);
+    ASTNode* ParseDefArray(ASTNode* var);
+    ASTNode* ParseDefFunc(ASTNode* var);
 public:
     Parser();
     ~Parser();

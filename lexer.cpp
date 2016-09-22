@@ -171,6 +171,9 @@ Token Lexer::LexIdentifier() {
     } else if (identifier_name == "while") {
         tokens_.push_back(std::make_pair(Token::KEYWORD_WHILE, identifier_name));
         return Token::KEYWORD_WHILE;
+    } else if (identifier_name == "function") {
+        tokens_.push_back(std::make_pair(Token::KEYWORD_FUNCTION, identifier_name));
+        return Token::KEYWORD_FUNCTION;
     } else if (identifier_name == "return") {
         tokens_.push_back(std::make_pair(Token::KEYWORD_RET, identifier_name));
         return Token::KEYWORD_RET;
