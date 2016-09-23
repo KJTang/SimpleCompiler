@@ -3,6 +3,12 @@
 #include <iostream>
 #include <stack>
 
+#define ERR(str) \
+do { \
+    err_occur_ = true; \
+    ErrorHandler::GetInstance()->ThrowError(str); \
+} while (false);
+
 Parser::Parser() {}
 
 Parser::~Parser() {}
@@ -14,11 +20,11 @@ void Parser::Input(const std::vector<std::pair<Token, std::string>>& tokens) {
 void Parser::Output(std::vector<ASTNode*>& astnode_list) {
     astnode_list = astnode_list_;
 
-    // Test
-    for (int i = 0; i != astnode_list_.size(); ++i) {
-        std::cout<<"--------------------------------------------"<<std::endl;
-        astnode_list_[i]->print();
-    }
+    // // Test
+    // for (int i = 0; i != astnode_list_.size(); ++i) {
+    //     std::cout<<"--------------------------------------------"<<std::endl;
+    //     astnode_list_[i]->print();
+    // }
 }
 
 bool Parser::Parse() {
@@ -28,9 +34,12 @@ bool Parser::Parse() {
         if (err_occur_) {
             return false;
         }
+        std::cout<<"--------------------------------------------"<<std::endl;
         if (node) {
             astnode_list_.push_back(node);
+            node->print();
         }
+        std::cout<<"--------------------------------------------"<<std::endl;
     }
     return true;
 }
@@ -46,6 +55,9 @@ ASTNode* Parser::ParseStatement() {
         case Token::KEYWORD_CLASS: {
             return ParseDefClass();
         }
+        case Token::KEYWORD_RET: {
+            return ParseReturnOperator();
+        }
         case static_cast<Token>(';'): {
             cur_token_ = tokens_[pos_++];
             return ParseStatement();
@@ -57,6 +69,8 @@ ASTNode* Parser::ParseStatement() {
 }
 
 ASTNode* Parser::ParseBlock() {
+    std::cout<<"ParseBlock: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '{'
     std::vector<ASTNode*> statements;
 
@@ -66,6 +80,13 @@ ASTNode* Parser::ParseBlock() {
         bool is_finished = false;
         while (!is_finished) {
             ASTNode* stat = ParseStatement();
+            // error occurs when parse statement
+            if (err_occur_) {
+                for (int i = 0; i != statements.size(); ++i) {
+                    delete statements[i];
+                }
+                return nullptr;
+            }
             if (stat) {
                 statements.push_back(stat);
             }
@@ -81,10 +102,12 @@ ASTNode* Parser::ParseBlock() {
 }
 
 ASTNode* Parser::ParseIfExpression() {
+    std::cout<<"ParseIfExpression: "<<cur_token_.second<<std::endl;
+
     cur_token_= tokens_[pos_++];    // eat "if"
     ASTNode* condition = ParseParenExpression();
-    if (!condition) {
-        // TODO: err
+    // error occurs when parse paren expression
+    if (err_occur_) {
         return nullptr;
     }
     
@@ -94,8 +117,8 @@ ASTNode* Parser::ParseIfExpression() {
     } else {
         if_block = ParseStatement();
     }
-    if (!if_block) {
-        // TODO: err
+    // error occurs when parse block/statement
+    if (err_occur_) {
         return nullptr;
     }
 
@@ -107,8 +130,8 @@ ASTNode* Parser::ParseIfExpression() {
         } else {
             else_block = ParseStatement();
         }
-        if (!else_block) {
-            // TODO: err
+        // error occurs when parse block/statement
+        if (err_occur_) {
             return nullptr;
         }
     }
@@ -118,10 +141,12 @@ ASTNode* Parser::ParseIfExpression() {
 }
 
 ASTNode* Parser::ParseWhileExpression() {
+    std::cout<<"ParseWhileExpression: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat "while"
     ASTNode* condition = ParseParenExpression();
-    if (!condition) {
-        // TODO: err
+    // error occurs when parse paren expression
+    if (err_occur_) {
         return nullptr;
     }
 
@@ -131,8 +156,8 @@ ASTNode* Parser::ParseWhileExpression() {
     } else {
         block = ParseStatement();
     }
-    if (!block) {
-        // TODO: err
+    // error occurs when parse block/statement
+    if (err_occur_) {
         return nullptr;
     }
 
@@ -141,7 +166,8 @@ ASTNode* Parser::ParseWhileExpression() {
 }
 
 ASTNode* Parser::ParseExpression() {
-    // std::cout<<"ParseExpression: "<<cur_token_.second<<std::endl;
+    std::cout<<"ParseExpression: "<<cur_token_.second<<std::endl;
+
     std::stack<ASTNode*> var_stack;
     std::stack<int> op_stack;
 
@@ -152,7 +178,11 @@ ASTNode* Parser::ParseExpression() {
         switch (cur_token_.first) {
             case static_cast<Token>('='): {
                 if (!is_token_var) {
-                    // TODO: err
+                    ERR("expected primary-expression before '=' token");
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
                     return nullptr;
                 }
                 while (!op_stack.empty()) {
@@ -168,7 +198,7 @@ ASTNode* Parser::ParseExpression() {
                 if (!var_stack.empty()) {
                     return ParseAssignment(var_stack.top());
                 } else {
-                    // TODO: err
+                    ERR("expression is invalid");
                     return nullptr;
                 }
             }
@@ -178,16 +208,77 @@ ASTNode* Parser::ParseExpression() {
                     break;
                 }
                 is_token_var = true;
-                var_stack.push(ParseParenExpression());
+
+                ASTNode* expr = ParseParenExpression();
+                // error occurs when parse paren expression 
+                if (err_occur_) {
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
+                    return nullptr;
+                }
+                var_stack.push(expr);
                 break;
             }
+            // anoymous array
+            case static_cast<Token>('['): {
+                if (is_token_var) {
+                    is_finished = true;
+                    break;
+                }
+                is_token_var = true;
+
+                ASTNode* arr = ParseDefArray(nullptr);
+                // error occurs when parse new array 
+                if (err_occur_) {
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
+                    return nullptr;
+                }
+                var_stack.push(arr);
+                break;
+            }
+            // anoymous function
             case Token::KEYWORD_FUNCTION: {
                 if (is_token_var) {
                     is_finished = true;
                     break;
                 }
                 is_token_var = true;
-                var_stack.push(ParseDefFunc(nullptr));
+
+                ASTNode* func = ParseDefFunc(nullptr);
+                // error occurs when parse function definition 
+                if (err_occur_) {
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
+                    return nullptr;
+                }
+                var_stack.push(func);
+                break;
+            }
+            // anoymous class instance
+            case Token::KEYWORD_NEW: {
+                if (is_token_var) {
+                    is_finished = true;
+                    break;
+                }
+                is_token_var = true;
+
+                ASTNode* new_class = ParseNewClassOperator(nullptr);
+                // error occurs when parse new class 
+                if (err_occur_) {
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
+                    return nullptr;
+                }
+                var_stack.push(new_class);
                 break;
             }
             case Token::IDENTIFIER: {
@@ -196,7 +287,17 @@ ASTNode* Parser::ParseExpression() {
                     break;
                 }
                 is_token_var = true;
-                var_stack.push(ParseVariable());
+
+                ASTNode* var = ParseVariable();
+                // error occurs when parse variable 
+                if (err_occur_) {
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
+                    return nullptr;
+                }
+                var_stack.push(var);
                 break;
             }
             case Token::CONST_NULL:
@@ -209,7 +310,17 @@ ASTNode* Parser::ParseExpression() {
                     break;
                 }
                 is_token_var = true;
-                var_stack.push(ParseConst());
+
+                ASTNode* var = ParseConst();
+                // error occurs when parse const 
+                if (err_occur_) {
+                    while (!var_stack.empty()) {
+                        delete var_stack.top();
+                        var_stack.pop();
+                    }
+                    return nullptr;
+                }
+                var_stack.push(var);
                 break;
             }
             default: {
@@ -242,6 +353,19 @@ ASTNode* Parser::ParseExpression() {
         }
     }
 
+    // empty expression
+    if (op_stack.empty()) {
+        if (var_stack.empty()) {
+            return nullptr;
+        } else {
+            while (var_stack.size() != 1) {
+                delete var_stack.top();
+                var_stack.pop();
+            }
+            return var_stack.top();
+        }
+    }
+    // not empty expression
     while (!op_stack.empty()) {
         int op = op_stack.top();
         op_stack.pop();
@@ -255,24 +379,26 @@ ASTNode* Parser::ParseExpression() {
     if (!var_stack.empty()) {
         return var_stack.top();
     } else {
-        // TODO: err
+        ERR("expression is invalid");
         return nullptr;
     }
 }
 
 ASTNode* Parser::ParseParenExpression() {
+    std::cout<<"ParseParenExpression: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '('
     if (static_cast<int>(cur_token_.first) == ')') {
-        // TODO: err
+        ERR("expected expression between '(' and ')' token");
         return nullptr;
     }
     ASTNode* expr = ParseExpression();
-    if (!expr) {
-        // TODO: err
+    // error occurs when parse expression
+    if (err_occur_) {
         return nullptr;
     }
     if (static_cast<int>(cur_token_.first) != ')') {
-        // TODO: err
+        ERR("expression ')'");
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ')'
@@ -280,14 +406,15 @@ ASTNode* Parser::ParseParenExpression() {
 }
 
 ASTNode* Parser::ParseConst() {
-    // std::cout<<"ParseConst: "<<tokens_[pos_-1].second<<std::endl;
+    std::cout<<"ParseConst: "<<cur_token_.second<<std::endl;
+
     ASTNode* node = new ASTConst(tokens_[pos_-1].first, tokens_[pos_-1].second);
     cur_token_ = tokens_[pos_++];
     return node;
 }
 
 ASTNode* Parser::ParseVariable() {
-    // std::cout<<"ParseVariable: "<<tokens_[pos_-1].second<<std::endl;
+    std::cout<<"ParseVariable: "<<cur_token_.second<<std::endl;
 
     ASTNode* node = new ASTVariable(tokens_[pos_-1].second);
     cur_token_ = tokens_[pos_++];
@@ -296,9 +423,7 @@ ASTNode* Parser::ParseVariable() {
         switch (cur_token_.first) {
             case static_cast<Token>('['): {
                 ASTNode* var_arr = ParseVarArray(node);
-                if (!var_arr) {
-                    // TODO: err
-                    err_occur_ = true;
+                if (err_occur_) {
                     return nullptr;
                 }
                 node = var_arr;
@@ -306,9 +431,7 @@ ASTNode* Parser::ParseVariable() {
             }
             case static_cast<Token>('.'): {
                 ASTNode* var_mem = ParseVarMember(node);
-                if (!var_mem) {
-                    // TODO: err
-                    err_occur_ = true;
+                if (err_occur_) {
                     return nullptr;
                 }
                 node = var_mem;
@@ -316,9 +439,7 @@ ASTNode* Parser::ParseVariable() {
             }
             case static_cast<Token>('('): {
                 ASTNode* var_func = ParseVarFunc(node);
-                if (!var_func) {
-                    // TODO: err
-                    err_occur_ = true;
+                if (err_occur_) {
                     return nullptr;
                 }
                 node = var_func;
@@ -335,14 +456,15 @@ ASTNode* Parser::ParseVariable() {
 }
 
 ASTNode* Parser::ParseVarArray(ASTNode* var) {
+    std::cout<<"ParseVarArray: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '['
     ASTNode* expr = ParseExpression();
-    if (!expr) {
-        // TODO:err
+    if (err_occur_) {
         return nullptr;
     }
     if (static_cast<int>(cur_token_.first) != ']') {
-        // TODO: err
+        ERR("expected ']'");
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ']'
@@ -351,10 +473,11 @@ ASTNode* Parser::ParseVarArray(ASTNode* var) {
 }
 
 ASTNode* Parser::ParseVarMember(ASTNode* var) {
+    std::cout<<"ParseVarMember: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '.'
     ASTNode* member = ParseVariable();
-    if (!member) {
-        // TODO:err
+    if (err_occur_) {
         return nullptr;
     }
     ASTNode* node = new ASTVarMember(var, member);
@@ -362,6 +485,8 @@ ASTNode* Parser::ParseVarMember(ASTNode* var) {
 }
 
 ASTNode* Parser::ParseVarFunc(ASTNode* var) {
+    std::cout<<"ParseVarFunc: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '('
     std::vector<ASTNode*> parameters;
     if (static_cast<int>(cur_token_.first) == ')') {
@@ -370,11 +495,13 @@ ASTNode* Parser::ParseVarFunc(ASTNode* var) {
         bool is_finished = false;
         while (!is_finished) {
             ASTNode* param = ParseExpression();
-            if (!param) {
-                // TODO: err
+            if (err_occur_) {
                 return nullptr;
             }
-            parameters.push_back(param);
+            // if function has parameters
+            if (param) {
+                parameters.push_back(param);
+            }
 
             if (static_cast<int>(cur_token_.first) == ',') {
                 cur_token_ = tokens_[pos_++];   // eat ','
@@ -382,7 +509,7 @@ ASTNode* Parser::ParseVarFunc(ASTNode* var) {
                 cur_token_ = tokens_[pos_++];   // eat ')'
                 is_finished = true;
             } else {
-                // TODO: err
+                ERR("expected '')'");
                 return nullptr;
             }
         }
@@ -391,53 +518,54 @@ ASTNode* Parser::ParseVarFunc(ASTNode* var) {
     return node;
 }
 
-ASTNode* Parser::ParseNewClass(ASTNode* var) {
-    cur_token_ = tokens_[pos_++];   // eat "new"
-    if (cur_token_.first != Token::IDENTIFIER) {
-        // TODO: err
-        return nullptr;
-    }
-    ASTNode* class_name = new ASTVariable(cur_token_.second);
-    cur_token_ = tokens_[pos_++];
-    if (static_cast<int>(cur_token_.first) != '(') {
-        // TODO: err
-        return nullptr;
-    }
-    ASTNode* func = ParseVarFunc(class_name);
-    if (!func) {
-        // TODO: err
-        return nullptr;
-    }
-
-    ASTNode* node = new ASTNewClass(var, class_name, func);
-    return node;
-}
-
 ASTNode* Parser::ParseAssignment(ASTNode* var) {
+    std::cout<<"ParseAssignment: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '='
     ASTNode* node = nullptr;
     if (static_cast<int>(cur_token_.first) == '[') {
-        node = ParseDefArray(var);
+        ASTNode* arr = ParseDefArray(var);
+        if (err_occur_) {
+            return nullptr;
+        }
+        node = arr;
     } else if (cur_token_.first == Token::KEYWORD_FUNCTION) {
-        node = ParseDefFunc(var);
+        ASTNode* func = ParseDefFunc(var);
+        if (err_occur_) {
+            return nullptr;
+        }
+        node = func;
     } else if (cur_token_.first == Token::KEYWORD_NEW) {
-        node = ParseNewClass(var);
+        ASTNode* new_class = ParseNewClassOperator(var);
+        if (err_occur_) {
+            return nullptr;
+        }
+        node = new_class;
     } else {
         ASTNode* expr = ParseExpression();
+        if (err_occur_) {
+            return nullptr;
+        }
+        if (!expr) {
+            ERR("expected value after '=' token");
+            return nullptr;
+        }
         node = new ASTAssign(var, expr);
     }
     return node;
 }
 
 ASTNode* Parser::ParseDefArray(ASTNode* var) {
+    std::cout<<"ParseDefArray: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat '['
     ASTNode* size = ParseExpression();
-    if (!size) {
-        // TODO: err
+    // error occurs when parse expression
+    if (err_occur_) {
         return nullptr;
     }
     if (static_cast<int>(cur_token_.first) != ']') {
-        // TODO: err
+        ERR("expected ']'");
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ']'
@@ -446,9 +574,11 @@ ASTNode* Parser::ParseDefArray(ASTNode* var) {
 }
 
 ASTNode* Parser::ParseDefFunc(ASTNode* var) {
+    std::cout<<"ParseDefFunc: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat "function"
     if (static_cast<int>(cur_token_.first) != '(') {
-        // TODO: err
+        ERR("expected parameters after 'function' token");
         return nullptr;
     }
     
@@ -460,11 +590,13 @@ ASTNode* Parser::ParseDefFunc(ASTNode* var) {
         bool is_finished = false;
         while (!is_finished) {
             ASTNode* param = ParseExpression();
-            if (!param) {
-                // TODO: err
+            if (err_occur_) {
                 return nullptr;
             }
-            parameters.push_back(param);
+            // if function has parameters
+            if (param) {
+                parameters.push_back(param);
+            }
 
             if (static_cast<int>(cur_token_.first) == ',') {
                 cur_token_ = tokens_[pos_++];   // eat ','
@@ -472,24 +604,31 @@ ASTNode* Parser::ParseDefFunc(ASTNode* var) {
                 cur_token_ = tokens_[pos_++];   // eat ')'
                 is_finished = true;
             } else {
-                // TODO: err
+                ERR("expected ')");
                 return nullptr;
             }
         }
     }
 
     if (static_cast<int>(cur_token_.first) != '{') {
-        // TODO: err
+        ERR("expected function definition");
+        return nullptr;
     }
     ASTNode* block = ParseBlock();
+    // error occurs when parse block
+    if (err_occur_) {
+        return nullptr;
+    }
     ASTNode* node = new ASTDefFunc(var, parameters, block);
     return node;
 }
 
 ASTNode* Parser::ParseDefClass() {
+    std::cout<<"ParseDefClass: "<<cur_token_.second<<std::endl;
+
     cur_token_ = tokens_[pos_++];   // eat "class"
     if (cur_token_.first != Token::IDENTIFIER) {
-        // TODO: err
+        ERR("expected class name after 'class' token");
         return nullptr;
     }
     
@@ -500,7 +639,7 @@ ASTNode* Parser::ParseDefClass() {
     if (static_cast<int>(cur_token_.first) == ':') {
         cur_token_ = tokens_[pos_++];   // eat ':'
         if (cur_token_.first != Token::IDENTIFIER) {
-            // TODO: err
+            ERR("expected parent class name after ':' token");
             return nullptr;
         }
         parent = new ASTVariable(cur_token_.second);
@@ -509,15 +648,51 @@ ASTNode* Parser::ParseDefClass() {
 
     ASTNode* block = nullptr;
     if (static_cast<int>(cur_token_.first) != '{') {
-        // TODO: err
+        ERR("expected class definition");
         return nullptr;
     }
     block = ParseBlock();
-    if (!block) {
-        // TODO: err
+    // error occurs when parse block
+    if (err_occur_) {
         return nullptr;
     }
 
     ASTNode* node = new ASTDefClass(self, parent, block);
+    return node;
+}
+
+ASTNode* Parser::ParseNewClassOperator(ASTNode* var) {
+    std::cout<<"ParseNewClassOperator: "<<cur_token_.second<<std::endl;
+
+    cur_token_ = tokens_[pos_++];   // eat "new"
+    if (cur_token_.first != Token::IDENTIFIER) {
+        ERR("expected type-specifier after 'new' token");
+        return nullptr;
+    }
+    ASTNode* class_name = new ASTVariable(cur_token_.second);
+    cur_token_ = tokens_[pos_++];
+    if (static_cast<int>(cur_token_.first) != '(') {
+        ERR("expected '(' after type-specifier");
+        return nullptr;
+    }
+    ASTNode* func = ParseVarFunc(class_name);
+    // error occurs when parse function definition
+    if (err_occur_) {
+        return nullptr;
+    }
+
+    ASTNode* node = new ASTNewClassOp(var, class_name, func);
+    return node;
+}
+
+ASTNode* Parser::ParseReturnOperator() {
+    std::cout<<"ParseReturnOperator: "<<cur_token_.second<<std::endl;
+
+    cur_token_ = tokens_[pos_++];   // eat "return"
+    ASTNode* expr = ParseExpression();
+    if (err_occur_) {
+        return nullptr;
+    }
+    ASTNode* node = new ASTReturnOp(expr);
     return node;
 }

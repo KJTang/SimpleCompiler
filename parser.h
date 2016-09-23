@@ -20,8 +20,6 @@ static std::map<int, int> binary_operator_precedence = {
     {'-', 2}, 
     {'*', 3}, 
     {'/', 3},
-    {'[', 4},
-    {'.', 4},
 };
 
 class Parser {
@@ -47,11 +45,13 @@ private:
     ASTNode* ParseVarArray(ASTNode* var);
     ASTNode* ParseVarMember(ASTNode* var);
     ASTNode* ParseVarFunc(ASTNode* var);
-    ASTNode* ParseNewClass(ASTNode* var);
     ASTNode* ParseAssignment(ASTNode* var);
     ASTNode* ParseDefArray(ASTNode* var);
     ASTNode* ParseDefFunc(ASTNode* var);
     ASTNode* ParseDefClass();
+
+    ASTNode* ParseNewClassOperator(ASTNode* var);
+    ASTNode* ParseReturnOperator();
 public:
     Parser();
     ~Parser();

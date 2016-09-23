@@ -171,9 +171,53 @@ public:
 
     // Test
     virtual void print() {
-        std::cout<<"ASTBinaryOp: \t"<<(char)op_<<std::endl;
+        std::cout<<"ASTBinaryOp: \t"<<(char)op_<<"("<<op_<<")"<<std::endl;
         l_node_->print();
         r_node_->print();
+    }
+};
+
+class ASTNewClassOp : public ASTNode {
+private:
+    ASTNode* var_;
+    ASTNode* class_name_;
+    ASTNode* func_;
+public:
+    ASTNewClassOp(ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
+        set_type(ASTTYPE::VARIABLE);
+    }
+    ~ASTNewClassOp() {}
+    
+    // Test
+    virtual void print() {
+        std::cout<<"ASTNewClassOp: \t"<<"new class"<<std::endl;
+        if (var_) {
+            var_->print();
+        } else {
+            std::cout<<"ASTNewClassOp: \tAnonymous"<<std::endl;
+        }
+        class_name_->print();
+        func_->print();
+    }
+};
+
+class ASTReturnOp : public ASTNode {
+private:
+    ASTNode* return_value_;
+public:
+    ASTReturnOp(ASTNode* return_value) : return_value_(return_value) {
+        set_type(ASTTYPE::DEFAULT);
+    }
+    ~ASTReturnOp() {}
+
+    // Test
+    virtual void print() {
+        std::cout<<"ASTReturnOp: \t"<<"return"<<std::endl;
+        if (return_value_) {
+            return_value_->print();
+        } else {
+            std::cout<<"ASTReturnOp: \treturn null"<<std::endl;
+        }
     }
 };
 
@@ -208,7 +252,11 @@ public:
     // Test
     virtual void print() {
         std::cout<<"ASTDefArray: \t"<<"def []"<<std::endl;
-        var_->print();
+        if (var_) {
+            var_->print();
+        } else {
+            std::cout<<"ASTDefArray: \tAnonymous"<<std::endl;
+        }
         size_->print();
     }  
 };
@@ -258,26 +306,6 @@ public:
             parent_->print();
         }
         block_->print();
-    }
-};
-
-class ASTNewClass : public ASTNode {
-private:
-    ASTNode* var_;
-    ASTNode* class_name_;
-    ASTNode* func_;
-public:
-    ASTNewClass(ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
-        set_type(ASTTYPE::VARIABLE);
-    }
-    ~ASTNewClass() {}
-    
-    // Test
-    virtual void print() {
-        std::cout<<"ASTNewClass: \t"<<"new class"<<std::endl;
-        var_->print();
-        class_name_->print();
-        func_->print();
     }
 };
 

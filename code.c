@@ -1,5 +1,16 @@
 
-test(function(){ a = 0; });
+factorial = function(num) {
+    if (num == 1) {
+        return 1;
+    }
+    return factorial(num - 1);
+}
+
+main = function() {
+    num = 0;
+    Input(num);
+    Output(factorial(num));
+}
 
 // if (a + 1) {
 //     //
