@@ -181,6 +181,15 @@ ASTNode* Parser::ParseExpression() {
                 var_stack.push(ParseParenExpression());
                 break;
             }
+            case Token::KEYWORD_FUNCTION: {
+                if (is_token_var) {
+                    is_finished = true;
+                    break;
+                }
+                is_token_var = true;
+                var_stack.push(ParseDefFunc(nullptr));
+                break;
+            }
             case Token::IDENTIFIER: {
                 if (is_token_var) {
                     is_finished = true;

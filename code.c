@@ -1,18 +1,5 @@
 
-class Parent {
-    a = 0;
-    f = function() {
-        b = 0;
-    }
-}
-
-class Child : Parent {
-    f = function() {
-        c = 0;
-    }
-}
-
-a = new Child();
+test(function(){ a = 0; });
 
 // if (a + 1) {
 //     //

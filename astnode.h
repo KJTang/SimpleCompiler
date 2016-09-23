@@ -227,7 +227,11 @@ public:
     // Test
     virtual void print() {
         std::cout<<"ASTDefFunc: \t"<<"def ("<<parameters_.size()<<")"<<std::endl;
-        var_->print();
+        if (var_) {
+            var_->print();
+        } else {
+            std::cout<<"ASTDefFunc: \tAnonymous"<<std::endl;
+        }
         for (int i = 0; i != parameters_.size(); ++i) {
             parameters_[i]->print();
         }
