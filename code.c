@@ -14,56 +14,56 @@ main = function() {
 
 main();
 
-// if (a + 1) {
-//     //
-//     b = [100];
-// } else {
-//     while (true) {
-//         c + 1;
-//     }
-// }
+if (a + 1) {
+    //
+    b = [100];
+} else {
+    while (true) {
+        c + 1;
+    }
+}
 
-// func = function () {
-//     arr = [(100 / a) - b + c(d)];
-// }
+func = function () {
+    arr = [(100 / a) - b + c(d)];
+}
 
 
-// var = arr[0] + arr[1].func(1, b[1]*2/c.d, a = 1);
+var = arr[0] + arr[1].func(1, b[1]*2/c.d, a = 1);
 
-// n.a[0] + 5 / (1 - n.a[100-99]) * n.a[2].b;
+n.a[0] + 5 / (1 - n.a[100-99]) * n.a[2].b;
 
-// n = null;
-// a = 0;
-// b = 1.2;
-// c = "test";
+n = null;
+a = 0;
+b = 1.2;
+c = "test";
 
-// d = [100];
-// d[0] = a;
-// d[1] = b;
-// d[2] = c;
-// d[3] = function () {
-//     //
-// };
-// d[4] = [5];
-// d[4][0] = true;
+d = [100];
+d[0] = a;
+d[1] = b;
+d[2] = c;
+d[3] = function () {
+    //
+};
+d[4] = [5];
+d[4][0] = true;
 
-// class e {
-//     a = 0;
-//     b = 1;
-//     c = function () {
-//         print("1");
-//     }
-// }
+class e {
+    a = 0;
+    b = 1;
+    c = function () {
+        print("1");
+    }
+}
 
-// class f : e {
-//     c = function () {
-//         print("2");
-//     }
-// }
+class f : e {
+    c = function () {
+        print("2");
+    }
+}
 
-// main = function () {
-//     f1 = new f();
-//     f1.c();
-// }
+main = function () {
+    f1 = new f();
+    f1.c();
+}
 
-// main();
+main();

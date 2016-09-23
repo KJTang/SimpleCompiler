@@ -42,7 +42,11 @@ public:
     ASTBlock(const std::vector<ASTNode*>& statments) : statements_(statments) {
         set_type(ASTTYPE::DEFAULT);
     }
-    ~ASTBlock() {}
+    ~ASTBlock() {
+        for (int i = 0; i != statements_.size(); ++i) {
+            delete statements_[i];
+        }
+    }
 
     // Test
     virtual void print() {
@@ -75,7 +79,10 @@ public:
     ASTVarArray(ASTNode* var, ASTNode* expr) : var_(var), expr_(expr) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTVarArray() {}
+    ~ASTVarArray() {
+        delete var_;
+        delete expr_;
+    }
 
     // Test
     virtual void print() {
@@ -93,7 +100,10 @@ public:
     ASTVarMember(ASTNode* var, ASTNode* member) : var_(var), member_(member) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTVarMember() {}
+    ~ASTVarMember() {
+        delete var_;
+        delete member_;
+    }
 
     // Test
     virtual void print() {
@@ -111,7 +121,12 @@ public:
     ASTVarFunc(ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTVarFunc() {}
+    ~ASTVarFunc() {
+        delete var_;
+        for (int i = 0; i != parameters_.size(); ++i) {
+            delete parameters_[i];
+        }
+    }
 
     // Test
     virtual void print() {
@@ -167,7 +182,10 @@ public:
     ASTBinaryOp(int op, ASTNode* l_node, ASTNode* r_node) : op_(op), l_node_(l_node), r_node_(r_node) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTBinaryOp() {}
+    ~ASTBinaryOp() {
+        delete l_node_;
+        delete r_node_;
+    }
 
     // Test
     virtual void print() {
@@ -186,7 +204,13 @@ public:
     ASTNewClassOp(ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTNewClassOp() {}
+    ~ASTNewClassOp() {
+        if (var_) {
+            delete var_;
+        }
+        delete class_name_;
+        delete func_;
+    }
     
     // Test
     virtual void print() {
@@ -208,7 +232,11 @@ public:
     ASTReturnOp(ASTNode* return_value) : return_value_(return_value) {
         set_type(ASTTYPE::DEFAULT);
     }
-    ~ASTReturnOp() {}
+    ~ASTReturnOp() {
+        if (return_value_) {
+            delete return_value_;
+        }
+    }
 
     // Test
     virtual void print() {
@@ -229,7 +257,10 @@ public:
     ASTAssign(ASTNode* l_node, ASTNode* r_node) : l_node_(l_node), r_node_(r_node) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTAssign() {}
+    ~ASTAssign() {
+        delete l_node_;
+        delete r_node_;
+    }
 
     // Test
     virtual void print() {
@@ -247,7 +278,12 @@ public:
     ASTDefArray(ASTNode* var, ASTNode* size) : var_(var), size_(size) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTDefArray() {}
+    ~ASTDefArray() {
+        if (var_) {
+            delete var_;
+        }
+        delete size_;
+    }
   
     // Test
     virtual void print() {
@@ -270,7 +306,15 @@ public:
     ASTDefFunc(ASTNode* var, const std::vector<ASTNode*>& parameters, ASTNode* block) : var_(var), parameters_(parameters), block_(block) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTDefFunc() {}
+    ~ASTDefFunc() {
+        if (var_) {
+            delete var_;
+        }
+        for (int i = 0; i != parameters_.size(); ++i) {
+            delete parameters_[i];
+        }
+        delete block_;
+    }
   
     // Test
     virtual void print() {
@@ -296,7 +340,13 @@ public:
     ASTDefClass(ASTNode* self, ASTNode* parent, ASTNode* block) : self_(self), parent_(parent), block_(block) {
         set_type(ASTTYPE::DEFAULT);
     }
-    ~ASTDefClass() {}
+    ~ASTDefClass() {
+        delete self_;
+        if (parent_) {
+            delete parent_;
+        }
+        delete block_;
+    }
 
     // Test
     virtual void print() {
@@ -318,7 +368,13 @@ public:
     ASTIfExpr(ASTNode* condition, ASTNode* if_block, ASTNode* else_block) : condition_(condition), if_block_(if_block), else_block_(else_block) {
         set_type(ASTTYPE::DEFAULT);
     }
-    ~ASTIfExpr() {}
+    ~ASTIfExpr() {
+        delete condition_;
+        delete if_block_;
+        if (else_block_) {
+            delete else_block_;
+        }
+    }
     
     // Test
     virtual void print() {
@@ -339,7 +395,10 @@ public:
     ASTWhileExpr(ASTNode* condition, ASTNode* block) : condition_(condition), block_(block) {
         set_type(ASTTYPE::DEFAULT);
     }
-    ~ASTWhileExpr() {}
+    ~ASTWhileExpr() {
+        delete condition_;
+        delete block_;
+    }
     
     // Test
     virtual void print() {

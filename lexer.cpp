@@ -8,7 +8,11 @@ do { \
 
 Lexer::Lexer() {}
 
-Lexer::~Lexer() {}
+Lexer::~Lexer() {
+    for (int i = 0; i != tokens_.size(); ++i) {
+        delete tokens_[i];
+    }
+}
 
 void Lexer::Input(const std::string& raw_str) {
     raw_str_ = raw_str;

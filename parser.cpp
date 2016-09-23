@@ -11,7 +11,11 @@ do { \
 
 Parser::Parser() {}
 
-Parser::~Parser() {}
+Parser::~Parser() {
+    for (int i = 0; i != astnode_list_.size(); ++i) {
+        delete astnode_list_[i];
+    }
+}
 
 void Parser::Input(const std::vector<TokenStruct*>& tokens) {
     tokens_ = tokens;
