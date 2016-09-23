@@ -32,21 +32,28 @@ enum class Token : int {
     END_OF_FILE = -1
 };
 
-// struct TokenStruct {
-//     Token type;
-//     std::string value;
-//     int line;
-// };
+struct TokenStruct {
+    Token type;
+    std::string value;
+    int line;
+
+    TokenStruct(Token t, const std::string& v, int l) {
+        type = t;
+        value = v;
+        line = l;
+    }
+};
 
 class Lexer {
 private:
     // input
     std::string raw_str_;
     // output
-    std::vector<std::pair<Token, std::string>> tokens_;
+    std::vector<TokenStruct*> tokens_;
 
     char cur_char_;
     int pos_ = 0;
+    int line_ = 1;
     bool err_occur_ = false;
 
     Token LexToken();
@@ -59,6 +66,6 @@ public:
     ~Lexer();
     
     void Input(const std::string& raw_str);
-    void Output(std::vector<std::pair<Token, std::string>>& tokens);
+    void Output(std::vector<TokenStruct*>& tokens);
     bool Lex();
 };

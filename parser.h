@@ -25,11 +25,11 @@ static std::map<int, int> binary_operator_precedence = {
 class Parser {
 private:
     // input
-    std::vector<std::pair<Token, std::string>> tokens_;
+    std::vector<TokenStruct*> tokens_;
     // output
     std::vector<ASTNode*> astnode_list_;
 
-    std::pair<Token, std::string> cur_token_;
+    TokenStruct* cur_token_;
     int pos_ = 0;
     bool err_occur_ = false;
 
@@ -56,7 +56,7 @@ public:
     Parser();
     ~Parser();
     
-    void Input(const std::vector<std::pair<Token, std::string>>& tokens);
+    void Input(const std::vector<TokenStruct*>& tokens);
     void Output(std::vector<ASTNode*>& astnode_list);
     bool Parse();
 };

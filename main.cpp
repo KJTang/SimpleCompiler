@@ -17,7 +17,7 @@ int main(int argc, char *args[]) {
     // compiler input & lexer input
     std::string inputStr((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
     // lexer output & parser input
-    std::vector<std::pair<Token, std::string>> tokens;
+    std::vector<TokenStruct*> tokens;
     // parser output
     std::vector<ASTNode*> astnode_list;
     // compiler output

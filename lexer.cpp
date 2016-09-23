@@ -1,5 +1,11 @@
 #include "lexer.h"
 
+#define ERR(line, str) \
+do { \
+    err_occur_ = true; \
+    ErrorHandler::GetInstance()->ThrowError(line, str); \
+} while (false);
+
 Lexer::Lexer() {}
 
 Lexer::~Lexer() {}
@@ -8,17 +14,15 @@ void Lexer::Input(const std::string& raw_str) {
     raw_str_ = raw_str;
 }
 
-void Lexer::Output(std::vector<std::pair<Token, std::string>>& tokens) {
+void Lexer::Output(std::vector<TokenStruct*>& tokens) {
     tokens = tokens_;
 
     // Test
+    std::cout<<"======================== Lex Start ======================"<<std::endl;
     for (int i = 0; i != tokens_.size(); ++i) {
-        if ((int)tokens_[i].first <= 255 && (int)tokens_[i].first >= 0) {
-            std::cout<<tokens_[i].second<<std::endl;
-        } else {
-            std::cout<<(int)tokens_[i].first<<":\t"<<tokens_[i].second<<std::endl;
-        }
+        std::cout<<(int)tokens_[i]->type<<"\t"<<tokens_[i]->value<<"\t"<<tokens_[i]->line<<std::endl;
     }
+    std::cout<<"======================== Lex End ========================"<<std::endl;
 }
 
 bool Lexer::Lex() {
@@ -38,6 +42,9 @@ Token Lexer::LexToken() {
     cur_char_ = raw_str_[pos_++];
     // shift space and '\n'
     while (cur_char_ == ' ' || cur_char_ == '\n') {
+        if (cur_char_ == '\n') {
+            ++line_;
+        }
         cur_char_ = raw_str_[pos_++];
     }
     // identifier
@@ -58,12 +65,12 @@ Token Lexer::LexToken() {
     switch (cur_char_) {
         // end of file
         case '\0': {
-            tokens_.push_back(std::make_pair(Token::END_OF_FILE, "\0"));
+            tokens_.push_back(new TokenStruct(Token::END_OF_FILE, "\0", line_));
             return Token::END_OF_FILE;
         }
         case '>': {
             if (raw_str_[pos_] == '=') {
-                tokens_.push_back(std::make_pair(Token::OP_GTE, ">="));
+                tokens_.push_back(new TokenStruct(Token::OP_GTE, ">=", line_));
                 ++pos_;
                 return Token::OP_GTE;
             }
@@ -71,7 +78,7 @@ Token Lexer::LexToken() {
         }
         case '<': {
             if (raw_str_[pos_] == '=') {
-                tokens_.push_back(std::make_pair(Token::OP_LTE, "<="));
+                tokens_.push_back(new TokenStruct(Token::OP_LTE, "<=", line_));
                 ++pos_;
                 return Token::OP_LTE;
             }
@@ -79,7 +86,7 @@ Token Lexer::LexToken() {
         }
         case '=': {
             if (raw_str_[pos_] == '=') {
-                tokens_.push_back(std::make_pair(Token::OP_EQU, "=="));
+                tokens_.push_back(new TokenStruct(Token::OP_EQU, "==", line_));
                 ++pos_;
                 return Token::OP_EQU;
             }
@@ -87,7 +94,7 @@ Token Lexer::LexToken() {
         }
         case '!': {
             if (raw_str_[pos_] == '=') {
-                tokens_.push_back(std::make_pair(Token::OP_NE, "!="));
+                tokens_.push_back(new TokenStruct(Token::OP_NE, "!=", line_));
                 ++pos_;
                 return Token::OP_NE;
             }
@@ -95,7 +102,7 @@ Token Lexer::LexToken() {
         }
         case '&': {
             if (raw_str_[pos_] == '&') {
-                tokens_.push_back(std::make_pair(Token::OP_AND, "&&"));
+                tokens_.push_back(new TokenStruct(Token::OP_AND, "&&", line_));
                 ++pos_;
                 return Token::OP_AND;
             }
@@ -103,7 +110,7 @@ Token Lexer::LexToken() {
         }
         case '|': {
             if (raw_str_[pos_] == '|') {
-                tokens_.push_back(std::make_pair(Token::OP_OR, "||"));
+                tokens_.push_back(new TokenStruct(Token::OP_OR, "||", line_));
                 ++pos_;
                 return Token::OP_OR;
             }
@@ -117,9 +124,10 @@ Token Lexer::LexToken() {
                     cur_char_ = raw_str_[pos_++];
                 } while (cur_char_ != '\0' && cur_char_ != '\n');
                 if (cur_char_ != '\0') {
+                    ++line_;
                     return this->LexToken();
                 } else {
-                    tokens_.push_back(std::make_pair(Token::END_OF_FILE, "\0"));
+                    tokens_.push_back(new TokenStruct(Token::END_OF_FILE, "\0", line_));
                     return Token::END_OF_FILE;
                 }
             }
@@ -129,7 +137,7 @@ Token Lexer::LexToken() {
         // ascii
         default: {
             ASCII:
-            tokens_.push_back(std::make_pair((Token)cur_char_, std::string(1, cur_char_)));
+            tokens_.push_back(new TokenStruct((Token)cur_char_, std::string(1, cur_char_), line_));
             return (Token)cur_char_;
         }
     }
@@ -148,40 +156,40 @@ Token Lexer::LexIdentifier() {
     --pos_;
     // const null/bool
     if (identifier_name == "null") {
-        tokens_.push_back(std::make_pair(Token::CONST_NULL, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::CONST_NULL, identifier_name, line_));
         return Token::CONST_NULL;
     } else if (identifier_name == "true") {
-        tokens_.push_back(std::make_pair(Token::CONST_BOOL, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::CONST_BOOL, identifier_name, line_));
         return Token::CONST_BOOL;
     } else if (identifier_name == "false") {
-        tokens_.push_back(std::make_pair(Token::CONST_BOOL, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::CONST_BOOL, identifier_name, line_));
         return Token::CONST_BOOL;
     }
     // keywords
     // def: class | if | else | while | return
     else if (identifier_name == "class") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_CLASS, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_CLASS, identifier_name, line_));
         return Token::KEYWORD_CLASS;
     } else if (identifier_name == "new") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_NEW, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_NEW, identifier_name, line_));
         return Token::KEYWORD_NEW;
     } else if (identifier_name == "if") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_IF, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_IF, identifier_name, line_));
         return Token::KEYWORD_IF;
     } else if (identifier_name == "else") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_ELSE, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_ELSE, identifier_name, line_));
         return Token::KEYWORD_ELSE;
     } else if (identifier_name == "while") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_WHILE, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_WHILE, identifier_name, line_));
         return Token::KEYWORD_WHILE;
     } else if (identifier_name == "function") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_FUNCTION, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_FUNCTION, identifier_name, line_));
         return Token::KEYWORD_FUNCTION;
     } else if (identifier_name == "return") {
-        tokens_.push_back(std::make_pair(Token::KEYWORD_RET, identifier_name));
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_RET, identifier_name, line_));
         return Token::KEYWORD_RET;
     }
-    tokens_.push_back(std::make_pair(Token::IDENTIFIER, identifier_name));
+    tokens_.push_back(new TokenStruct(Token::IDENTIFIER, identifier_name, line_));
     return Token::IDENTIFIER;
 }
 
@@ -201,10 +209,10 @@ Token Lexer::LexNumber() {
     }
     --pos_;
     if (is_int) {
-        tokens_.push_back(std::make_pair(Token::CONST_INT, const_str));
+        tokens_.push_back(new TokenStruct(Token::CONST_INT, const_str, line_));
         return Token::CONST_INT;
     } else {
-        tokens_.push_back(std::make_pair(Token::CONST_DOUBLE, const_str));
+        tokens_.push_back(new TokenStruct(Token::CONST_DOUBLE, const_str, line_));
         return Token::CONST_DOUBLE;
     }
 }
@@ -215,13 +223,12 @@ Token Lexer::LexString() {
     cur_char_ = raw_str_[pos_++];
     while (cur_char_ != '\"') {
         if (pos_ >= raw_str_.size()) {
-            err_occur_ = true;
-            ErrorHandler::GetInstance()->ThrowError("Missing \"");
+            ERR(line_, "Missing \"");
             return Token::END_OF_FILE;
         }
         const_str += cur_char_;
         cur_char_ = raw_str_[pos_++];
     }
-    tokens_.push_back(std::make_pair(Token::CONST_STRING, const_str));
+    tokens_.push_back(new TokenStruct(Token::CONST_STRING, const_str, line_));
     return Token::CONST_STRING;
 }

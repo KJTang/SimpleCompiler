@@ -4,6 +4,6 @@
 
 ErrorHandler* ErrorHandler::shared_ptr = nullptr;
 
-void ErrorHandler::ThrowError(const std::string& info) {
-    std::cout<<"Error: "<<info<<std::endl;
+void ErrorHandler::ThrowError(int line, const std::string& info) {
+    std::cout<<"Line: "<<line<<"\tError: "<<info<<std::endl;
 }

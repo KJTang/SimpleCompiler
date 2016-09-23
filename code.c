@@ -12,6 +12,8 @@ main = function() {
     Output(factorial(num));
 }
 
+main();
+
 // if (a + 1) {
 //     //
 //     b = [100];
@@ -39,7 +41,7 @@ main = function() {
 // d[0] = a;
 // d[1] = b;
 // d[2] = c;
-// d[3] = () {
+// d[3] = function () {
 //     //
 // };
 // d[4] = [5];
@@ -48,18 +50,18 @@ main = function() {
 // class e {
 //     a = 0;
 //     b = 1;
-//     c = () {
+//     c = function () {
 //         print("1");
 //     }
 // }
 
 // class f : e {
-//     c = () {
+//     c = function () {
 //         print("2");
 //     }
 // }
 
-// main = () {
+// main = function () {
 //     f1 = new f();
 //     f1.c();
 // }

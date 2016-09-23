@@ -16,5 +16,5 @@ public:
         return shared_ptr;
     }
 
-    void ThrowError(const std::string& info);
+    void ThrowError(int line, const std::string& info);
 };
