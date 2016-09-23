@@ -32,6 +32,12 @@ enum class Token : int {
     END_OF_FILE = -1
 };
 
+// struct TokenStruct {
+//     Token type;
+//     std::string value;
+//     int line;
+// };
+
 class Lexer {
 private:
     // input

@@ -62,8 +62,23 @@ ASTNode* Parser::ParseStatement() {
             cur_token_ = tokens_[pos_++];
             return ParseStatement();
         }
-        default: {
+        case static_cast<Token>('['): 
+        case static_cast<Token>('('): 
+        case static_cast<Token>('}'): 
+        case Token::CONST_NULL: 
+        case Token::CONST_BOOL: 
+        case Token::CONST_INT: 
+        case Token::CONST_DOUBLE: 
+        case Token::CONST_STRING: 
+        case Token::KEYWORD_NEW: 
+        case Token::KEYWORD_FUNCTION: 
+        case Token::IDENTIFIER: {
             return ParseExpression();
+        }
+        default: {
+            ERR("invalid expression");
+            std::cout<<cur_token_.second<<std::endl;
+            return nullptr;
         }
     }
 }
