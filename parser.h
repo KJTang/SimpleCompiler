@@ -33,6 +33,9 @@ private:
     int pos_ = 0;
     bool err_occur_ = false;
 
+    // count block {}
+    int block_count_ = 0;
+
     ASTNode* ParseStatement();
     ASTNode* ParseBlock();
     ASTNode* ParseIfExpression();

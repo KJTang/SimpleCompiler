@@ -9,6 +9,11 @@ do { \
     ErrorHandler::GetInstance()->ThrowError(line, str); \
 } while (false);
 
+#define WARN(line, str) \
+do { \
+    ErrorHandler::GetInstance()->ThrowWarning(line, str); \
+} while (false);
+
 Parser::Parser() {}
 
 Parser::~Parser() {
@@ -29,7 +34,7 @@ void Parser::Output(std::vector<ASTNode*>& astnode_list) {
     for (int i = 0; i != astnode_list_.size(); ++i) {
         astnode_list_[i]->print();
     }
-    std::cout<<"======================== Parse End ===================="<<std::endl;
+    std::cout<<"======================== Parse End ======================"<<std::endl;
 }
 
 bool Parser::Parse() {
@@ -68,9 +73,15 @@ ASTNode* Parser::ParseStatement() {
             cur_token_ = tokens_[pos_++];
             return ParseStatement();
         }
+        case static_cast<Token>('}'): {
+            if (block_count_ <= 0) {
+                WARN(cur_token_->line, "unexpected token '}'");
+                cur_token_ = tokens_[pos_++];   // eat '}'
+                return ParseStatement();
+            }
+        }
         case static_cast<Token>('['): 
         case static_cast<Token>('('): 
-        case static_cast<Token>('}'): 
         case Token::CONST_NULL: 
         case Token::CONST_BOOL: 
         case Token::CONST_INT: 
@@ -93,10 +104,12 @@ ASTNode* Parser::ParseBlock() {
     // std::cout<<"ParseBlock: "<<cur_token_->value<<std::endl;
 
     cur_token_ = tokens_[pos_++];   // eat '{'
+    ++block_count_;
     std::vector<ASTNode*> statements;
 
     if (static_cast<int>(cur_token_->type) == '}') {
         cur_token_ = tokens_[pos_++];   // eat '}'
+        --block_count_;
     } else {
         bool is_finished = false;
         while (!is_finished) {
@@ -116,6 +129,7 @@ ASTNode* Parser::ParseBlock() {
             }
         }
         cur_token_ = tokens_[pos_++];   // eat '}'
+        --block_count_;
     }
 
     ASTNode* node = new ASTBlock(statements);

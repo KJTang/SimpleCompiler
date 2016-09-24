@@ -4,6 +4,7 @@
 
 #include "lexer.h"
 #include "parser.h"
+#include "err_handler.h"
 
 int main(int argc, char *args[]) {
     Lexer lexer;
@@ -30,6 +31,8 @@ int main(int argc, char *args[]) {
     parser.Input(tokens);
     parser.Parse();
     parser.Output(astnode_list);
+
+    ErrorHandler::GetInstance()->Output();
 
     return 0;
 }
