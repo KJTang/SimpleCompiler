@@ -38,23 +38,24 @@ private:
 
     ASTNode* ParseStatement();
     ASTNode* ParseBlock();
-    ASTNode* ParseIfExpression();
-    ASTNode* ParseWhileExpression();
+
     ASTNode* ParseExpression();
-    ASTNode* ParseParenExpression();
+    ASTNode* ParseExpressionIf();
+    ASTNode* ParseExpressionWhile();
+    ASTNode* ParseExpressionParen();
+    ASTNode* ParseExpressionAssignment(ASTNode* var);
 
     ASTNode* ParseConst();
     ASTNode* ParseVariable();
     ASTNode* ParseCallArray(ASTNode* var);
     ASTNode* ParseCallMember(ASTNode* var);
     ASTNode* ParseCallFunc(ASTNode* var);
-    ASTNode* ParseAssignment(ASTNode* var);
     ASTNode* ParseDefArray(ASTNode* var);
     ASTNode* ParseDefFunc(ASTNode* var);
     ASTNode* ParseDefClass();
 
-    ASTNode* ParseNewClassOperator(ASTNode* var);
-    ASTNode* ParseReturnOperator();
+    ASTNode* ParseOperatorNew(ASTNode* var);
+    ASTNode* ParseOperatorReturn();
 public:
     Parser();
     ~Parser();
