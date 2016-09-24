@@ -457,7 +457,7 @@ ASTNode* Parser::ParseVariable() {
     do {
         switch (cur_token_->type) {
             case static_cast<Token>('['): {
-                ASTNode* var_arr = ParseVarArray(node);
+                ASTNode* var_arr = ParseCallArray(node);
                 if (err_occur_) {
                     return nullptr;
                 }
@@ -465,7 +465,7 @@ ASTNode* Parser::ParseVariable() {
                 break;
             }
             case static_cast<Token>('.'): {
-                ASTNode* var_mem = ParseVarMember(node);
+                ASTNode* var_mem = ParseCallMember(node);
                 if (err_occur_) {
                     return nullptr;
                 }
@@ -473,7 +473,7 @@ ASTNode* Parser::ParseVariable() {
                 break;
             }
             case static_cast<Token>('('): {
-                ASTNode* var_func = ParseVarFunc(node);
+                ASTNode* var_func = ParseCallFunc(node);
                 if (err_occur_) {
                     return nullptr;
                 }
@@ -490,8 +490,8 @@ ASTNode* Parser::ParseVariable() {
     return node;
 }
 
-ASTNode* Parser::ParseVarArray(ASTNode* var) {
-    // std::cout<<"ParseVarArray: "<<cur_token_->value<<std::endl;
+ASTNode* Parser::ParseCallArray(ASTNode* var) {
+    // std::cout<<"ParseCallArray: "<<cur_token_->value<<std::endl;
 
     cur_token_ = tokens_[pos_++];   // eat '['
     ASTNode* expr = ParseExpression();
@@ -503,24 +503,24 @@ ASTNode* Parser::ParseVarArray(ASTNode* var) {
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ']'
-    ASTNode* node = new ASTVarArray(var, expr);
+    ASTNode* node = new ASTCallArray(var, expr);
     return node;
 }
 
-ASTNode* Parser::ParseVarMember(ASTNode* var) {
-    // std::cout<<"ParseVarMember: "<<cur_token_->value<<std::endl;
+ASTNode* Parser::ParseCallMember(ASTNode* var) {
+    // std::cout<<"ParseCallMember: "<<cur_token_->value<<std::endl;
 
     cur_token_ = tokens_[pos_++];   // eat '.'
     ASTNode* member = ParseVariable();
     if (err_occur_) {
         return nullptr;
     }
-    ASTNode* node = new ASTVarMember(var, member);
+    ASTNode* node = new ASTCallMember(var, member);
     return node;
 }
 
-ASTNode* Parser::ParseVarFunc(ASTNode* var) {
-    // std::cout<<"ParseVarFunc: "<<cur_token_->value<<std::endl;
+ASTNode* Parser::ParseCallFunc(ASTNode* var) {
+    // std::cout<<"ParseCallFunc: "<<cur_token_->value<<std::endl;
 
     cur_token_ = tokens_[pos_++];   // eat '('
     std::vector<ASTNode*> parameters;
@@ -549,7 +549,7 @@ ASTNode* Parser::ParseVarFunc(ASTNode* var) {
             }
         }
     }
-    ASTNode* node = new ASTVarFunc(var, parameters);
+    ASTNode* node = new ASTCallFunc(var, parameters);
     return node;
 }
 
@@ -710,7 +710,7 @@ ASTNode* Parser::ParseNewClassOperator(ASTNode* var) {
         ERR(cur_token_->line, "expected '(' after type-specifier");
         return nullptr;
     }
-    ASTNode* func = ParseVarFunc(class_name);
+    ASTNode* func = ParseCallFunc(class_name);
     // error occurs when parse function definition
     if (err_occur_) {
         return nullptr;

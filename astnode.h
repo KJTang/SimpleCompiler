@@ -71,57 +71,57 @@ public:
     }
 };
 
-class ASTVarArray : public ASTNode {
+class ASTCallArray : public ASTNode {
 private:
     ASTNode* var_;
     ASTNode* expr_;
 public:
-    ASTVarArray(ASTNode* var, ASTNode* expr) : var_(var), expr_(expr) {
+    ASTCallArray(ASTNode* var, ASTNode* expr) : var_(var), expr_(expr) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTVarArray() {
+    ~ASTCallArray() {
         delete var_;
         delete expr_;
     }
 
     // Test
     virtual void print() {
-        std::cout<<"ASTVarArray: \t"<<"[]"<<std::endl;
+        std::cout<<"ASTCallArray: \t"<<"[]"<<std::endl;
         var_->print();
         expr_->print();
     }
 };
 
-class ASTVarMember : public ASTNode {
+class ASTCallMember : public ASTNode {
 private:
     ASTNode* var_;
     ASTNode* member_;
 public:
-    ASTVarMember(ASTNode* var, ASTNode* member) : var_(var), member_(member) {
+    ASTCallMember(ASTNode* var, ASTNode* member) : var_(var), member_(member) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTVarMember() {
+    ~ASTCallMember() {
         delete var_;
         delete member_;
     }
 
     // Test
     virtual void print() {
-        std::cout<<"ASTVarMember: \t"<<"."<<std::endl;
+        std::cout<<"ASTCallMember: \t"<<"."<<std::endl;
         var_->print();
         member_->print();
     }
 };
 
-class ASTVarFunc : public ASTNode {
+class ASTCallFunc : public ASTNode {
 private:
     ASTNode* var_;
     std::vector<ASTNode*> parameters_;
 public:
-    ASTVarFunc(ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
+    ASTCallFunc(ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
         set_type(ASTTYPE::VARIABLE);
     }
-    ~ASTVarFunc() {
+    ~ASTCallFunc() {
         delete var_;
         for (int i = 0; i != parameters_.size(); ++i) {
             delete parameters_[i];
@@ -130,7 +130,7 @@ public:
 
     // Test
     virtual void print() {
-        std::cout<<"ASTVarFunc: \t"<<"("<<parameters_.size()<<")"<<std::endl;
+        std::cout<<"ASTCallFunc: \t"<<"("<<parameters_.size()<<")"<<std::endl;
         var_->print();
         for (int i = 0; i != parameters_.size(); ++i) {
             parameters_[i]->print();

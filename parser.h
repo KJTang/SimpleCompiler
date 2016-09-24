@@ -45,9 +45,9 @@ private:
 
     ASTNode* ParseConst();
     ASTNode* ParseVariable();
-    ASTNode* ParseVarArray(ASTNode* var);
-    ASTNode* ParseVarMember(ASTNode* var);
-    ASTNode* ParseVarFunc(ASTNode* var);
+    ASTNode* ParseCallArray(ASTNode* var);
+    ASTNode* ParseCallMember(ASTNode* var);
+    ASTNode* ParseCallFunc(ASTNode* var);
     ASTNode* ParseAssignment(ASTNode* var);
     ASTNode* ParseDefArray(ASTNode* var);
     ASTNode* ParseDefFunc(ASTNode* var);
