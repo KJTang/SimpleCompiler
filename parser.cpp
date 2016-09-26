@@ -360,6 +360,13 @@ ASTNode* Parser::ParseExpression() {
             }
             default: {
                 if (!is_token_var) {
+                    if (static_cast<int>(cur_token_->type) != '{') {
+                        while (!var_stack.empty()) {
+                            delete var_stack.top();
+                            var_stack.pop();
+                        }
+                        ERR(cur_token_->line, "expected variable after token '" + cur_token_->value + "'");
+                    }
                     is_finished = true;
                     break;
                 }
