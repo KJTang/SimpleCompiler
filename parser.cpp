@@ -32,7 +32,7 @@ void Parser::Output(std::vector<ASTNode*>& astnode_list) {
     // Test
     std::cout<<"======================== Parse Start ===================="<<std::endl;
     for (int i = 0; i != astnode_list_.size(); ++i) {
-        astnode_list_[i]->print();
+        astnode_list_[i]->Print();
     }
     std::cout<<"======================== Parse End ======================"<<std::endl;
 }
@@ -360,6 +360,13 @@ ASTNode* Parser::ParseExpression() {
             }
             default: {
                 if (!is_token_var) {
+                    if (static_cast<int>(cur_token_->type) != '{') {
+                        while (!var_stack.empty()) {
+                            delete var_stack.top();
+                            var_stack.pop();
+                        }
+                        ERR(cur_token_->line, "expected variable after token '" + cur_token_->value + "'");
+                    }
                     is_finished = true;
                     break;
                 }
