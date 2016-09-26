@@ -32,7 +32,7 @@ void Parser::Output(std::vector<ASTNode*>& astnode_list) {
     // Test
     std::cout<<"======================== Parse Start ===================="<<std::endl;
     for (int i = 0; i != astnode_list_.size(); ++i) {
-        astnode_list_[i]->print();
+        astnode_list_[i]->Print();
     }
     std::cout<<"======================== Parse End ======================"<<std::endl;
 }

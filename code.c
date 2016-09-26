@@ -8,6 +8,7 @@ factorial = function(num) {
 
 main = function() {
     num = 0;
+    a = 1;
     Input(num);
     Output(factorial(num));
 }

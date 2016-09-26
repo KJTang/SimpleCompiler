@@ -31,8 +31,13 @@ public:
     void set_value(const std::string& value) { value_ = value; }
     std::string get_value() { return value_; }
 
+    // false: this node can be remove
+    virtual bool Analysis() {
+        return true;
+    }
+
     // Test
-    virtual void print() {}
+    virtual void Print() {}
 };
 
 class ASTBlock : public ASTNode {
@@ -48,11 +53,27 @@ public:
         }
     }
 
+    virtual bool Analysis() {
+        for (int i = 0; i < statements_.size(); ) {
+            if (!statements_[i]->Analysis()) {
+                delete statements_[i];
+                statements_.erase(statements_.begin() + i);
+            } else {
+                ++i;
+            }
+        }
+        if (statements_.size() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTBlock: \t"<<"{"<<statements_.size()<<"}"<<std::endl;
         for (int i = 0; i != statements_.size(); ++i) {
-            statements_[i]->print();
+            statements_[i]->Print();
         }
     }
 };
@@ -87,7 +108,7 @@ public:
     ~ASTConst() {}
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTConst: \t"<<get_value()<<std::endl;
     }
 };
@@ -101,7 +122,7 @@ public:
     ~ASTVariable() {}
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTVariable: \t"<<get_value()<<std::endl;
     }
 };
@@ -120,10 +141,10 @@ public:
     }
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTCallArray: \t"<<"[]"<<std::endl;
-        var_->print();
-        expr_->print();
+        var_->Print();
+        expr_->Print();
     }
 };
 
@@ -141,10 +162,10 @@ public:
     }
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTCallMember: \t"<<"."<<std::endl;
-        var_->print();
-        member_->print();
+        var_->Print();
+        member_->Print();
     }
 };
 
@@ -164,11 +185,11 @@ public:
     }
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTCallFunc: \t"<<"("<<parameters_.size()<<")"<<std::endl;
-        var_->print();
+        var_->Print();
         for (int i = 0; i != parameters_.size(); ++i) {
-            parameters_[i]->print();
+            parameters_[i]->Print();
         }
     }
 };
@@ -187,11 +208,17 @@ public:
         delete r_node_;
     }
 
+    virtual bool Analysis() {
+        l_node_->Analysis();
+        r_node_->Analysis();
+        return true;
+    }
+
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTOperatorBinary: \t"<<(char)op_<<"("<<op_<<")"<<std::endl;
-        l_node_->print();
-        r_node_->print();
+        l_node_->Print();
+        r_node_->Print();
     }
 };
 
@@ -213,15 +240,15 @@ public:
     }
     
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTOperatorNew: \t"<<"new class"<<std::endl;
         if (var_) {
-            var_->print();
+            var_->Print();
         } else {
             std::cout<<"ASTOperatorNew: \tAnonymous"<<std::endl;
         }
-        class_name_->print();
-        func_->print();
+        class_name_->Print();
+        func_->Print();
     }
 };
 
@@ -239,10 +266,10 @@ public:
     }
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTOperatorReturn: \t"<<"return"<<std::endl;
         if (return_value_) {
-            return_value_->print();
+            return_value_->Print();
         } else {
             std::cout<<"ASTOperatorReturn: \treturn null"<<std::endl;
         }
@@ -265,14 +292,14 @@ public:
     }
   
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTDefArray: \t"<<"def []"<<std::endl;
         if (var_) {
-            var_->print();
+            var_->Print();
         } else {
             std::cout<<"ASTDefArray: \tAnonymous"<<std::endl;
         }
-        size_->print();
+        size_->Print();
     }  
 };
 
@@ -296,17 +323,17 @@ public:
     }
   
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTDefFunc: \t"<<"def ("<<parameters_.size()<<")"<<std::endl;
         if (var_) {
-            var_->print();
+            var_->Print();
         } else {
             std::cout<<"ASTDefFunc: \tAnonymous"<<std::endl;
         }
         for (int i = 0; i != parameters_.size(); ++i) {
-            parameters_[i]->print();
+            parameters_[i]->Print();
         }
-        block_->print();
+        block_->Print();
     }
 };
 
@@ -328,13 +355,13 @@ public:
     }
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTDefClass: \t"<<"def class"<<std::endl;
-        self_->print();
+        self_->Print();
         if (parent_) {
-            parent_->print();
+            parent_->Print();
         }
-        block_->print();
+        block_->Print();
     }
 };
 
@@ -352,10 +379,10 @@ public:
     }
 
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTExprAssign: \t"<<"="<<std::endl;
-        l_node_->print();
-        r_node_->print();
+        l_node_->Print();
+        r_node_->Print();
     }
 };
 
@@ -377,12 +404,12 @@ public:
     }
     
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTExprIf: \t"<<"if"<<std::endl;
-        condition_->print();
-        if_block_->print();
+        condition_->Print();
+        if_block_->Print();
         if (else_block_) {
-            else_block_->print();
+            else_block_->Print();
         }
     }  
 };
@@ -401,9 +428,9 @@ public:
     }
     
     // Test
-    virtual void print() {
+    virtual void Print() {
         std::cout<<"ASTExprWhile: \t"<<"while"<<std::endl;
-        condition_->print();
-        block_->print();
+        condition_->Print();
+        block_->Print();
     }  
 };
