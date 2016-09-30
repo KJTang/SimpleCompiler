@@ -1,19 +1,21 @@
+a = 1 + 2.0 * 3 / 4 - 5;
 
-factorial = function(num) {
-    if (num == 1) {
-        return 1;
-    }
-    return factorial(num - 1);
-}
+// factorial = function(num) {
+//     if (num == 1) {
+//         return 1;
+//     }
+//     return factorial(num - 1);
+// }
 
-main = function() {
-    num = 0;
-    a = 1;
-    Input(num);
-    Output(factorial(num));
-}
+// main = function() {
+//     num = 0;
+//     a = 1 + 2 * 3 / 4 - 5;
+//     Input(num);
+//     Output(factorial(num));
+// }
 
-main();
+// main();
+
 
 // if (a + 1) {
 //     //

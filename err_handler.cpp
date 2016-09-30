@@ -1,31 +1,17 @@
 #include "err_handler.h"
 
 #include <iostream>
-#include <algorithm>
 
-std::string TransIntToString(int i) {
-    if (i == 0) {
-        return "0";
-    }
-
-    std::string s;
-    while (i != 0) {
-        s += (i % 10) + '0';
-        i /= 10;
-    }
-
-    std::reverse(s.begin(), s.end());
-    return s;
-}
+#include "converter.h"
 
 ErrorHandler* ErrorHandler::shared_ptr_ = nullptr;
 
 void ErrorHandler::ThrowError(int line, const std::string& info) {
-    info_ += "Line: \t" + TransIntToString(line) + "\tError: " + info + "\n";
+    info_ += "Line: \t" + Converter::GetInstance()->ConvertIntToString(line) + "\tError: " + info + "\n";
 }
 
 void ErrorHandler::ThrowWarning(int line, const std::string& info) {
-    info_ += "Line: \t" + TransIntToString(line) + "\tWarning: " + info + "\n";
+    info_ += "Line: \t" + Converter::GetInstance()->ConvertIntToString(line) + "\tWarning: " + info + "\n";
 }
 
 void ErrorHandler::Output() {

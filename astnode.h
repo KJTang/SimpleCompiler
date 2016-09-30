@@ -7,23 +7,40 @@
 
 enum class ASTTYPE {
     DEFAULT,
-    VARIABLE,
-    CONST_NULL,
-    CONST_BOOL,
-    CONST_INT,
-    CONST_DOUBLE,
-    CONST_STRING,
-    FUNCTION,
-    CLASS,
+    BLOCK, 
+    VARIABLE, 
+    TYPE_NULL,
+    TYPE_BOOL,
+    TYPE_INT,
+    TYPE_DOUBLE,
+    TYPE_STRING,
+    CALL_ARR, 
+    CALL_MEMBER, 
+    CALL_FUNC,
+    OP_BIN,
+    OP_NEW,
+    OP_RET,
+    DEF_ARR,
+    DEF_FUNC,
+    DEF_CLASS,
+    EXPR_ASSIGN,
+    EXPR_IF,
+    EXPR_WHILE, 
 };
 
 class ASTNode {
 private:
+    bool is_const_ = false;
     ASTTYPE type_ = ASTTYPE::DEFAULT;
     std::string value_ = "null";
+    ASTNode* parent_ = nullptr;
+    int line_ = 0;
 public:
     ASTNode() {}
     ~ASTNode() {}
+
+    void set_is_const(bool is_const) { is_const_ = is_const; }
+    bool get_is_const() { return is_const_; }
 
     void set_type(ASTTYPE type) { type_ = type; }
     ASTTYPE get_type() { return type_; }
@@ -31,11 +48,13 @@ public:
     void set_value(const std::string& value) { value_ = value; }
     std::string get_value() { return value_; }
 
-    // false: this node can be remove
-    virtual bool Analysis() {
-        return true;
-    }
+    void set_parent(ASTNode* parent) { parent_ = parent; }
+    ASTNode* get_parent() { return parent_; }
 
+    void set_line(int line) { line_ = line; }
+    int get_line() { return line_; }
+
+    friend class Analyser;
     // Test
     virtual void Print() {}
 };
@@ -45,7 +64,10 @@ private:
     std::vector<ASTNode*> statements_;
 public:
     ASTBlock(const std::vector<ASTNode*>& statments) : statements_(statments) {
-        set_type(ASTTYPE::DEFAULT);
+        set_type(ASTTYPE::BLOCK);
+        for (int i = 0; i != statements_.size(); ++i) {
+            statements_[i]->set_parent(this);
+        }
     }
     ~ASTBlock() {
         for (int i = 0; i != statements_.size(); ++i) {
@@ -53,22 +75,7 @@ public:
         }
     }
 
-    virtual bool Analysis() {
-        for (int i = 0; i < statements_.size(); ) {
-            if (!statements_[i]->Analysis()) {
-                delete statements_[i];
-                statements_.erase(statements_.begin() + i);
-            } else {
-                ++i;
-            }
-        }
-        if (statements_.size() == 0) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTBlock: \t"<<"{"<<statements_.size()<<"}"<<std::endl;
@@ -81,25 +88,26 @@ public:
 class ASTConst : public ASTNode {
 public:
     ASTConst(Token token, const std::string& value) {
+        set_is_const(true);
         switch (token) {
             case Token::CONST_NULL: {
-                set_type(ASTTYPE::CONST_NULL);
+                set_type(ASTTYPE::TYPE_NULL);
                 break;
             }
             case Token::CONST_BOOL: {
-                set_type(ASTTYPE::CONST_BOOL);
+                set_type(ASTTYPE::TYPE_BOOL);
                 break;
             }
             case Token::CONST_INT: {
-                set_type(ASTTYPE::CONST_INT);
+                set_type(ASTTYPE::TYPE_INT);
                 break;
             }
             case Token::CONST_DOUBLE: {
-                set_type(ASTTYPE::CONST_DOUBLE);
+                set_type(ASTTYPE::TYPE_DOUBLE);
                 break;
             }
             case Token::CONST_STRING: {
-                set_type(ASTTYPE::CONST_STRING);
+                set_type(ASTTYPE::TYPE_STRING);
                 break;
             }
         }
@@ -107,6 +115,7 @@ public:
     }
     ~ASTConst() {}
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTConst: \t"<<get_value()<<std::endl;
@@ -121,6 +130,7 @@ public:
     }
     ~ASTVariable() {}
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTVariable: \t"<<get_value()<<std::endl;
@@ -133,13 +143,16 @@ private:
     ASTNode* expr_;
 public:
     ASTCallArray(ASTNode* var, ASTNode* expr) : var_(var), expr_(expr) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::CALL_ARR);
+        var_->set_parent(this);
+        expr_->set_parent(this);
     }
     ~ASTCallArray() {
         delete var_;
         delete expr_;
     }
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTCallArray: \t"<<"[]"<<std::endl;
@@ -154,13 +167,16 @@ private:
     ASTNode* member_;
 public:
     ASTCallMember(ASTNode* var, ASTNode* member) : var_(var), member_(member) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::CALL_MEMBER);
+        var_->set_parent(this);
+        member_->set_parent(this);
     }
     ~ASTCallMember() {
         delete var_;
         delete member_;
     }
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTCallMember: \t"<<"."<<std::endl;
@@ -175,7 +191,11 @@ private:
     std::vector<ASTNode*> parameters_;
 public:
     ASTCallFunc(ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::CALL_FUNC);
+        var_->set_parent(this);
+        for (int i = 0; i != parameters_.size(); ++i) {
+            parameters_[i]->set_parent(this);
+        }
     }
     ~ASTCallFunc() {
         delete var_;
@@ -184,6 +204,7 @@ public:
         }
     }
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTCallFunc: \t"<<"("<<parameters_.size()<<")"<<std::endl;
@@ -201,19 +222,16 @@ private:
     ASTNode* r_node_;
 public:
     ASTOperatorBinary(int op, ASTNode* l_node, ASTNode* r_node) : op_(op), l_node_(l_node), r_node_(r_node) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::OP_BIN);
+        l_node_->set_parent(this);
+        r_node_->set_parent(this);
     }
     ~ASTOperatorBinary() {
         delete l_node_;
         delete r_node_;
     }
 
-    virtual bool Analysis() {
-        l_node_->Analysis();
-        r_node_->Analysis();
-        return true;
-    }
-
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorBinary: \t"<<(char)op_<<"("<<op_<<")"<<std::endl;
@@ -229,7 +247,12 @@ private:
     ASTNode* func_;
 public:
     ASTOperatorNew(ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::OP_NEW);
+        if (var_) {
+            var_->set_parent(this);
+        }
+        class_name_->set_parent(this);
+        func_->set_parent(this);
     }
     ~ASTOperatorNew() {
         if (var_) {
@@ -238,7 +261,8 @@ public:
         delete class_name_;
         delete func_;
     }
-    
+
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorNew: \t"<<"new class"<<std::endl;
@@ -257,7 +281,10 @@ private:
     ASTNode* return_value_;
 public:
     ASTOperatorReturn(ASTNode* return_value) : return_value_(return_value) {
-        set_type(ASTTYPE::DEFAULT);
+        set_type(ASTTYPE::OP_RET);
+        if (return_value_) {
+            return_value_->set_parent(this);
+        }
     }
     ~ASTOperatorReturn() {
         if (return_value_) {
@@ -265,6 +292,7 @@ public:
         }
     }
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorReturn: \t"<<"return"<<std::endl;
@@ -282,7 +310,11 @@ private:
     ASTNode* size_;
 public:
     ASTDefArray(ASTNode* var, ASTNode* size) : var_(var), size_(size) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::DEF_ARR);
+        if (var_) {
+            var_->set_parent(this);
+        }
+        size_->set_parent(this);
     }
     ~ASTDefArray() {
         if (var_) {
@@ -290,7 +322,8 @@ public:
         }
         delete size_;
     }
-  
+
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefArray: \t"<<"def []"<<std::endl;
@@ -310,7 +343,14 @@ private:
     ASTNode* block_;
 public:
     ASTDefFunc(ASTNode* var, const std::vector<ASTNode*>& parameters, ASTNode* block) : var_(var), parameters_(parameters), block_(block) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::DEF_FUNC);
+        if (var_) {
+            var_->set_parent(this);
+        }
+        for (int i = 0; i != parameters_.size(); ++i) {
+            parameters_[i]->set_parent(this);
+        }
+        block_->set_parent(this);
     }
     ~ASTDefFunc() {
         if (var_) {
@@ -321,7 +361,8 @@ public:
         }
         delete block_;
     }
-  
+
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefFunc: \t"<<"def ("<<parameters_.size()<<")"<<std::endl;
@@ -340,26 +381,32 @@ public:
 class ASTDefClass : public ASTNode {
 private:
     ASTNode* self_;
-    ASTNode* parent_;
+    ASTNode* base_;
     ASTNode* block_;
 public:
-    ASTDefClass(ASTNode* self, ASTNode* parent, ASTNode* block) : self_(self), parent_(parent), block_(block) {
-        set_type(ASTTYPE::DEFAULT);
+    ASTDefClass(ASTNode* self, ASTNode* base, ASTNode* block) : self_(self), base_(base), block_(block) {
+        set_type(ASTTYPE::DEF_CLASS);
+        self_->set_parent(this);
+        if (base_) {
+            base_->set_parent(this);
+        }
+        block_->set_parent(this);
     }
     ~ASTDefClass() {
         delete self_;
-        if (parent_) {
-            delete parent_;
+        if (base_) {
+            delete base_;
         }
         delete block_;
     }
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefClass: \t"<<"def class"<<std::endl;
         self_->Print();
-        if (parent_) {
-            parent_->Print();
+        if (base_) {
+            base_->Print();
         }
         block_->Print();
     }
@@ -371,13 +418,16 @@ private:
     ASTNode* r_node_;
 public:
     ASTExprAssign(ASTNode* l_node, ASTNode* r_node) : l_node_(l_node), r_node_(r_node) {
-        set_type(ASTTYPE::VARIABLE);
+        set_type(ASTTYPE::EXPR_ASSIGN);
+        l_node_->set_parent(this);
+        r_node_->set_parent(this);
     }
     ~ASTExprAssign() {
         delete l_node_;
         delete r_node_;
     }
 
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTExprAssign: \t"<<"="<<std::endl;
@@ -393,7 +443,12 @@ private:
     ASTNode* else_block_;
 public:
     ASTExprIf(ASTNode* condition, ASTNode* if_block, ASTNode* else_block) : condition_(condition), if_block_(if_block), else_block_(else_block) {
-        set_type(ASTTYPE::DEFAULT);
+        set_type(ASTTYPE::EXPR_IF);
+        condition_->set_parent(this);
+        if_block_->set_parent(this);
+        if (else_block_) {
+            else_block_->set_parent(this);
+        }
     }
     ~ASTExprIf() {
         delete condition_;
@@ -402,7 +457,8 @@ public:
             delete else_block_;
         }
     }
-    
+
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTExprIf: \t"<<"if"<<std::endl;
@@ -420,13 +476,16 @@ private:
     ASTNode* block_;
 public:
     ASTExprWhile(ASTNode* condition, ASTNode* block) : condition_(condition), block_(block) {
-        set_type(ASTTYPE::DEFAULT);
+        set_type(ASTTYPE::EXPR_WHILE);
+        condition_->set_parent(this);
+        block_->set_parent(this);
     }
     ~ASTExprWhile() {
         delete condition_;
         delete block_;
     }
-    
+
+    friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTExprWhile: \t"<<"while"<<std::endl;

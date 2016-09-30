@@ -2,13 +2,17 @@
 #include <sstream>
 #include <fstream>
 
+#include "err_handler.h"
 #include "lexer.h"
 #include "parser.h"
-#include "err_handler.h"
+#include "analyser.h"
+
+#include "converter.h"
 
 int main(int argc, char *args[]) {
     Lexer lexer;
     Parser parser;
+    Analyser analyser;
 
     if (argc != 2) {
         std::cout<<"code file not given"<<std::endl;
@@ -19,8 +23,10 @@ int main(int argc, char *args[]) {
     std::string inputStr((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
     // lexer output & parser input
     std::vector<TokenStruct*> tokens;
-    // parser output
+    // parser output & analyser input
     std::vector<ASTNode*> astnode_list;
+    // analyser output
+    std::vector<ASTNode*> analysised_list;
     // compiler output
     std::string outputStr;
 
@@ -32,7 +38,13 @@ int main(int argc, char *args[]) {
     parser.Parse();
     parser.Output(astnode_list);
 
+    analyser.Input(astnode_list);
+    analyser.Analysis();
+    analyser.Output(analysised_list);
+
     ErrorHandler::GetInstance()->Output();
+
+    std::cout<<"test: "<<Converter::GetInstance()->ConvertStringToDouble("0.0000000000001")<<std::endl;
 
     return 0;
 }

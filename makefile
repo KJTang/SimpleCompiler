@@ -5,9 +5,11 @@ CC = g++
 # files
 SRC =   main.cpp \
 		err_handler.cpp \
+		converter.cpp \
 		astnode.cpp \
 		lexer.cpp \
-		parser.cpp
+		parser.cpp \
+		analyser.cpp
 
 # object files
 OBJS = $(SRC:.cpp=.o)
