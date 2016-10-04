@@ -10,8 +10,8 @@ private:
     ASTNode* ValueCalculateInt(int line, int op, ASTNode* l, ASTNode* r);
     ASTNode* ValueCalculateDouble(int line, int op, ASTNode* l, ASTNode* r);
     ASTNode* ValueCalculateString(int line, int op, ASTNode* l, ASTNode* r);
-
     ASTNode* LogicCalculate(int line, int op, ASTNode* l, ASTNode* r);
+    ASTNode* ConditionCalculate(int line, int op, ASTNode* l, ASTNode* r);
 public:
     Calculator() {}
     ~Calculator() {}

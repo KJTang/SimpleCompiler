@@ -10,16 +10,18 @@
 
 // operators(+ - / *) precedence
 static std::map<int, int> binary_operator_precedence = {
-    {'<', 1}, 
-    {'>', 1}, 
-    {(int)Token::OP_GTE, 1}, 
-    {(int)Token::OP_LTE, 1}, 
-    {(int)Token::OP_EQU, 1}, 
-    {(int)Token::OP_NE, 1}, 
-    {'+', 2}, 
-    {'-', 2}, 
-    {'*', 3}, 
-    {'/', 3},
+    {(int)Token::OP_AND, 1}, 
+    {(int)Token::OP_OR, 1}, 
+    {'<', 2}, 
+    {'>', 2}, 
+    {(int)Token::OP_GTE, 2}, 
+    {(int)Token::OP_LTE, 2}, 
+    {(int)Token::OP_EQU, 2}, 
+    {(int)Token::OP_NE, 2}, 
+    {'+', 3}, 
+    {'-', 3}, 
+    {'*', 4}, 
+    {'/', 4},
 };
 
 class Parser {

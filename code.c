@@ -1,4 +1,6 @@
-a = 1 + 2 * 3 / 4 - 5;
+// a = 1 + 2 * 3.0 / 4 - 5;
+// b = "hello" + " world" + (12-3) + null;
+c = true || false || 1 > 2;
 
 // factorial = function(num) {
 //     if (num == 1) {
