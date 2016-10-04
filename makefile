@@ -6,6 +6,7 @@ CC = g++
 SRC =   main.cpp \
 		err_handler.cpp \
 		converter.cpp \
+		calculator.cpp \
 		astnode.cpp \
 		lexer.cpp \
 		parser.cpp \

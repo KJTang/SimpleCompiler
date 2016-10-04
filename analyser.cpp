@@ -1,6 +1,8 @@
 #include "analyser.h"
 
 #include "err_handler.h"
+#include "converter.h"
+#include "calculator.h"
 
 #define ERR(line, str) \
 do { \
@@ -13,18 +15,24 @@ do { \
     ErrorHandler::GetInstance()->ThrowWarning(line, str); \
 } while (false);
 
-
 void Analyser::Input(const std::vector<ASTNode*>& input_list) {
-    input_list_ = input_list;
+    ast_list_ = input_list;
 }
 
 void Analyser::Output(std::vector<ASTNode*>& output_list) {
-    output_list = output_list_;
+    output_list = ast_list_;
+
+    // Test
+    std::cout<<"======================== Analysis Start ================="<<std::endl;
+    for (int i = 0; i != ast_list_.size(); ++i) {
+        ast_list_[i]->Print();
+    }
+    std::cout<<"======================== Analysis End ==================="<<std::endl;
 }
 
 bool Analyser::Analysis() {
-    for (int i = 0; i != input_list_.size(); ++i) {
-        AnalysisNode(input_list_[i]);
+    for (int i = 0; i != ast_list_.size(); ++i) {
+        AnalysisNode(ast_list_[i]);
     }
     return true;
 }
@@ -180,27 +188,12 @@ bool Analyser::AnalysisOperatorBinary(ASTNode* op) {
     AnalysisNode(op_->l_node_);
     AnalysisNode(op_->r_node_);
     if (op_->l_node_->get_is_const() && op_->r_node_->get_is_const()) {
-        switch (op_->l_node_->get_type()) {
-            case ASTTYPE::TYPE_NULL: {
-                // TODO: 
-                ERR(op_->get_line(), "type '" + type_name[op_->r_node_->get_type()] + "' cannot compute with type 'null'");
-                break;
-            }
-            case ASTTYPE::TYPE_BOOL: {
-                // TODO: 
-                ERR(op_->get_line(), "type '" + type_name[op_->r_node_->get_type()] + "' cannot compute with type 'bool'");
-                break;
-            }
-            case ASTTYPE::TYPE_INT: {
-                switch (op_->r_node_->get_type()) {
-                    case ASTTYPE::TYPE_INT: {
-                        //
-                        break;
-                    }
-                }
-                break;
-            }
+        ASTNode* result = Calculator::GetInstance()->Calculate(op_->get_line(), op_->op_, op_->l_node_, op_->r_node_);
+        if (!result) {
+            ERR(op_->get_line(), "cannot compute type '" + type_name[op_->l_node_->get_type()] + "' with type '" + type_name[op_->r_node_->get_type()] + "'");
+            return false;
         }
+        op_->parent_->ReplaceChild(op_, result);
     }
     return true;
 }

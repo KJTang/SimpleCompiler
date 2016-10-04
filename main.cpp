@@ -44,7 +44,5 @@ int main(int argc, char *args[]) {
 
     ErrorHandler::GetInstance()->Output();
 
-    std::cout<<"test: "<<Converter::GetInstance()->ConvertStringToDouble("0.0000000000001")<<std::endl;
-
     return 0;
 }

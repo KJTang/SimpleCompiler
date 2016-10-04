@@ -16,8 +16,7 @@ static std::map<ASTTYPE, std::string> type_name = {
 
 class Analyser {
 private:
-    std::vector<ASTNode*> input_list_;
-    std::vector<ASTNode*> output_list_;
+    std::vector<ASTNode*> ast_list_;
 
     bool err_occur_ = false;
 

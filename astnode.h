@@ -54,6 +54,8 @@ public:
     void set_line(int line) { line_ = line; }
     int get_line() { return line_; }
 
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {}
+
     friend class Analyser;
     // Test
     virtual void Print() {}
@@ -63,7 +65,8 @@ class ASTBlock : public ASTNode {
 private:
     std::vector<ASTNode*> statements_;
 public:
-    ASTBlock(const std::vector<ASTNode*>& statments) : statements_(statments) {
+    ASTBlock(int line, const std::vector<ASTNode*>& statements) : statements_(statements) {
+        set_line(line);
         set_type(ASTTYPE::BLOCK);
         for (int i = 0; i != statements_.size(); ++i) {
             statements_[i]->set_parent(this);
@@ -72,6 +75,16 @@ public:
     ~ASTBlock() {
         for (int i = 0; i != statements_.size(); ++i) {
             delete statements_[i];
+        }
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        for (int i = 0; i != statements_.size(); ++i) {
+            if (statements_[i] == cur_child) {
+                statements_[i] = new_child;
+                delete cur_child;
+                break;
+            }
         }
     }
 
@@ -87,7 +100,8 @@ public:
 
 class ASTConst : public ASTNode {
 public:
-    ASTConst(Token token, const std::string& value) {
+    ASTConst(int line, Token token, const std::string& value) {
+        set_line(line);
         set_is_const(true);
         switch (token) {
             case Token::CONST_NULL: {
@@ -124,7 +138,8 @@ public:
 
 class ASTVariable : public ASTNode {
 public:
-    ASTVariable(const std::string& var_name) {
+    ASTVariable(int line, const std::string& var_name) {
+        set_line(line);
         set_type(ASTTYPE::VARIABLE);
         set_value(var_name);
     }
@@ -142,7 +157,8 @@ private:
     ASTNode* var_;
     ASTNode* expr_;
 public:
-    ASTCallArray(ASTNode* var, ASTNode* expr) : var_(var), expr_(expr) {
+    ASTCallArray(int line, ASTNode* var, ASTNode* expr) : var_(var), expr_(expr) {
+        set_line(line);
         set_type(ASTTYPE::CALL_ARR);
         var_->set_parent(this);
         expr_->set_parent(this);
@@ -150,6 +166,16 @@ public:
     ~ASTCallArray() {
         delete var_;
         delete expr_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == var_) {
+            var_ = new_child;
+            delete cur_child;
+        } else if (cur_child == expr_) {
+            expr_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -166,7 +192,8 @@ private:
     ASTNode* var_;
     ASTNode* member_;
 public:
-    ASTCallMember(ASTNode* var, ASTNode* member) : var_(var), member_(member) {
+    ASTCallMember(int line, ASTNode* var, ASTNode* member) : var_(var), member_(member) {
+        set_line(line);
         set_type(ASTTYPE::CALL_MEMBER);
         var_->set_parent(this);
         member_->set_parent(this);
@@ -174,6 +201,16 @@ public:
     ~ASTCallMember() {
         delete var_;
         delete member_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == var_) {
+            var_ = new_child;
+            delete cur_child;
+        } else if (cur_child == member_) {
+            member_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -190,7 +227,8 @@ private:
     ASTNode* var_;
     std::vector<ASTNode*> parameters_;
 public:
-    ASTCallFunc(ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
+    ASTCallFunc(int line, ASTNode* var, const std::vector<ASTNode*>& parameters) : var_(var), parameters_(parameters) {
+        set_line(line);
         set_type(ASTTYPE::CALL_FUNC);
         var_->set_parent(this);
         for (int i = 0; i != parameters_.size(); ++i) {
@@ -201,6 +239,21 @@ public:
         delete var_;
         for (int i = 0; i != parameters_.size(); ++i) {
             delete parameters_[i];
+        }
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == var_) {
+            var_ = new_child;
+            delete cur_child;
+        } else {
+            for (int i = 0; i != parameters_.size(); ++i) {
+                if (parameters_[i] == cur_child) {
+                    parameters_[i] = new_child;
+                    delete cur_child;
+                    break;
+                }
+            }
         }
     }
 
@@ -221,7 +274,8 @@ private:
     ASTNode* l_node_;
     ASTNode* r_node_;
 public:
-    ASTOperatorBinary(int op, ASTNode* l_node, ASTNode* r_node) : op_(op), l_node_(l_node), r_node_(r_node) {
+    ASTOperatorBinary(int line, int op, ASTNode* l_node, ASTNode* r_node) : op_(op), l_node_(l_node), r_node_(r_node) {
+        set_line(line);
         set_type(ASTTYPE::OP_BIN);
         l_node_->set_parent(this);
         r_node_->set_parent(this);
@@ -229,6 +283,16 @@ public:
     ~ASTOperatorBinary() {
         delete l_node_;
         delete r_node_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == l_node_) {
+            l_node_ = new_child;
+            delete cur_child;
+        } else if (cur_child == r_node_) {
+            r_node_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -246,7 +310,8 @@ private:
     ASTNode* class_name_;
     ASTNode* func_;
 public:
-    ASTOperatorNew(ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
+    ASTOperatorNew(int line, ASTNode* var, ASTNode* class_name, ASTNode* func) : var_(var), class_name_(class_name), func_(func) {
+        set_line(line);
         set_type(ASTTYPE::OP_NEW);
         if (var_) {
             var_->set_parent(this);
@@ -260,6 +325,19 @@ public:
         }
         delete class_name_;
         delete func_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == var_) {
+            var_ = new_child;
+            delete cur_child;
+        } else if (cur_child == class_name_) {
+            class_name_ = new_child;
+            delete cur_child;
+        } else if (cur_child == func_) {
+            func_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -280,7 +358,8 @@ class ASTOperatorReturn : public ASTNode {
 private:
     ASTNode* return_value_;
 public:
-    ASTOperatorReturn(ASTNode* return_value) : return_value_(return_value) {
+    ASTOperatorReturn(int line, ASTNode* return_value) : return_value_(return_value) {
+        set_line(line);
         set_type(ASTTYPE::OP_RET);
         if (return_value_) {
             return_value_->set_parent(this);
@@ -289,6 +368,13 @@ public:
     ~ASTOperatorReturn() {
         if (return_value_) {
             delete return_value_;
+        }
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == return_value_) {
+            return_value_ = new_child;
+            delete cur_child;
         }
     }
 
@@ -309,7 +395,8 @@ private:
     ASTNode* var_;
     ASTNode* size_;
 public:
-    ASTDefArray(ASTNode* var, ASTNode* size) : var_(var), size_(size) {
+    ASTDefArray(int line, ASTNode* var, ASTNode* size) : var_(var), size_(size) {
+        set_line(line);
         set_type(ASTTYPE::DEF_ARR);
         if (var_) {
             var_->set_parent(this);
@@ -321,6 +408,16 @@ public:
             delete var_;
         }
         delete size_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == var_) {
+            var_ = new_child;
+            delete cur_child;
+        } else if (cur_child == size_) {
+            size_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -342,7 +439,8 @@ private:
     std::vector<ASTNode*> parameters_;
     ASTNode* block_;
 public:
-    ASTDefFunc(ASTNode* var, const std::vector<ASTNode*>& parameters, ASTNode* block) : var_(var), parameters_(parameters), block_(block) {
+    ASTDefFunc(int line, ASTNode* var, const std::vector<ASTNode*>& parameters, ASTNode* block) : var_(var), parameters_(parameters), block_(block) {
+        set_line(line);
         set_type(ASTTYPE::DEF_FUNC);
         if (var_) {
             var_->set_parent(this);
@@ -360,6 +458,24 @@ public:
             delete parameters_[i];
         }
         delete block_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == var_) {
+            var_ = new_child;
+            delete cur_child;
+        } else if (cur_child == block_) {
+            block_ = new_child;
+            delete cur_child;
+        } else {
+            for (int i = 0; i != parameters_.size(); ++i) {
+                if (cur_child == parameters_[i]) {
+                    parameters_[i] = new_child;
+                    delete cur_child;
+                    break;
+                }
+            }
+        }
     }
 
     friend class Analyser;
@@ -384,7 +500,8 @@ private:
     ASTNode* base_;
     ASTNode* block_;
 public:
-    ASTDefClass(ASTNode* self, ASTNode* base, ASTNode* block) : self_(self), base_(base), block_(block) {
+    ASTDefClass(int line, ASTNode* self, ASTNode* base, ASTNode* block) : self_(self), base_(base), block_(block) {
+        set_line(line);
         set_type(ASTTYPE::DEF_CLASS);
         self_->set_parent(this);
         if (base_) {
@@ -398,6 +515,19 @@ public:
             delete base_;
         }
         delete block_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == self_) {
+            self_ = new_child;
+            delete cur_child;
+        } else if (cur_child == base_) {
+            base_ = new_child;
+            delete cur_child;
+        } else if (cur_child == block_) {
+            block_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -417,7 +547,8 @@ private:
     ASTNode* l_node_;
     ASTNode* r_node_;
 public:
-    ASTExprAssign(ASTNode* l_node, ASTNode* r_node) : l_node_(l_node), r_node_(r_node) {
+    ASTExprAssign(int line, ASTNode* l_node, ASTNode* r_node) : l_node_(l_node), r_node_(r_node) {
+        set_line(line);
         set_type(ASTTYPE::EXPR_ASSIGN);
         l_node_->set_parent(this);
         r_node_->set_parent(this);
@@ -425,6 +556,16 @@ public:
     ~ASTExprAssign() {
         delete l_node_;
         delete r_node_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == l_node_) {
+            l_node_ = new_child;
+            delete cur_child;
+        } else if (cur_child == r_node_) {
+            r_node_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;
@@ -442,7 +583,8 @@ private:
     ASTNode* if_block_;
     ASTNode* else_block_;
 public:
-    ASTExprIf(ASTNode* condition, ASTNode* if_block, ASTNode* else_block) : condition_(condition), if_block_(if_block), else_block_(else_block) {
+    ASTExprIf(int line, ASTNode* condition, ASTNode* if_block, ASTNode* else_block) : condition_(condition), if_block_(if_block), else_block_(else_block) {
+        set_line(line);
         set_type(ASTTYPE::EXPR_IF);
         condition_->set_parent(this);
         if_block_->set_parent(this);
@@ -455,6 +597,19 @@ public:
         delete if_block_;
         if (else_block_) {
             delete else_block_;
+        }
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == condition_) {
+            condition_ = new_child;
+            delete cur_child;
+        } else if (cur_child == if_block_) {
+            if_block_ = new_child;
+            delete cur_child;
+        } else if (cur_child == else_block_) {
+            else_block_ = new_child;
+            delete cur_child;
         }
     }
 
@@ -475,7 +630,8 @@ private:
     ASTNode* condition_;
     ASTNode* block_;
 public:
-    ASTExprWhile(ASTNode* condition, ASTNode* block) : condition_(condition), block_(block) {
+    ASTExprWhile(int line, ASTNode* condition, ASTNode* block) : condition_(condition), block_(block) {
+        set_line(line);
         set_type(ASTTYPE::EXPR_WHILE);
         condition_->set_parent(this);
         block_->set_parent(this);
@@ -483,6 +639,16 @@ public:
     ~ASTExprWhile() {
         delete condition_;
         delete block_;
+    }
+
+    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
+        if (cur_child == condition_) {
+            condition_ = new_child;
+            delete cur_child;
+        } else if (cur_child == block_) {
+            block_ = new_child;
+            delete cur_child;
+        }
     }
 
     friend class Analyser;

@@ -1,4 +1,4 @@
-a = 1 + 2.0 * 3 / 4 - 5;
+a = 1 + 2 * 3 / 4 - 5;
 
 // factorial = function(num) {
 //     if (num == 1) {

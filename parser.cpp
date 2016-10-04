@@ -133,8 +133,7 @@ ASTNode* Parser::ParseBlock() {
         --block_count_;
     }
 
-    ASTNode* node = new ASTBlock(statements);
-    node->set_line(line);
+    ASTNode* node = new ASTBlock(line, statements);
     return node;
 }
 
@@ -174,8 +173,7 @@ ASTNode* Parser::ParseExpressionIf() {
         }
     }
 
-    ASTNode* node = new ASTExprIf(condition, if_block, else_block);
-    node->set_line(line);
+    ASTNode* node = new ASTExprIf(line, condition, if_block, else_block);
     return node;
 }
 
@@ -201,8 +199,7 @@ ASTNode* Parser::ParseExpressionWhile() {
         return nullptr;
     }
 
-    ASTNode* node = new ASTExprWhile(condition, block);
-    node->set_line(line);
+    ASTNode* node = new ASTExprWhile(line, condition, block);
     return node;
 }
 
@@ -235,8 +232,7 @@ ASTNode* Parser::ParseExpression() {
                     var_stack.pop();
                     ASTNode* l_node = var_stack.top();
                     var_stack.pop();
-                    ASTNode* node = new ASTOperatorBinary(op, l_node, r_node);
-                    node->set_line(line);
+                    ASTNode* node = new ASTOperatorBinary(line, op, l_node, r_node);
                     var_stack.push(node);
                 }
                 if (!var_stack.empty()) {
@@ -394,8 +390,7 @@ ASTNode* Parser::ParseExpression() {
                     var_stack.pop();
                     ASTNode* l_node = var_stack.top();
                     var_stack.pop();
-                    ASTNode* node = new ASTOperatorBinary(op, l_node, r_node);
-                    node->set_line(line);
+                    ASTNode* node = new ASTOperatorBinary(line, op, l_node, r_node);
                     var_stack.push(node);
                 }
                 op_stack.push(static_cast<int>(cur_token_->type));
@@ -425,8 +420,7 @@ ASTNode* Parser::ParseExpression() {
         var_stack.pop();
         ASTNode* l_node = var_stack.top();
         var_stack.pop();
-        ASTNode* node = new ASTOperatorBinary(op, l_node, r_node);
-        node->set_line(line);
+        ASTNode* node = new ASTOperatorBinary(line, op, l_node, r_node);
         var_stack.push(node);
     }
     if (!var_stack.empty()) {
@@ -462,8 +456,7 @@ ASTNode* Parser::ParseConst() {
     // std::cout<<"ParseConst: "<<cur_token_->value<<std::endl;
 
     int line = cur_token_->line;
-    ASTNode* node = new ASTConst(cur_token_->type, cur_token_->value);
-    node->set_line(line);
+    ASTNode* node = new ASTConst(line, cur_token_->type, cur_token_->value);
     cur_token_ = tokens_[pos_++];
     return node;
 }
@@ -472,8 +465,7 @@ ASTNode* Parser::ParseVariable() {
     // std::cout<<"ParseVariable: "<<cur_token_->value<<std::endl;
 
     int line = cur_token_->line;
-    ASTNode* node = new ASTVariable(cur_token_->value);
-    node->set_line(line);
+    ASTNode* node = new ASTVariable(line, cur_token_->value);
     cur_token_ = tokens_[pos_++];
     bool is_finished = false;
     do {
@@ -526,8 +518,7 @@ ASTNode* Parser::ParseCallArray(ASTNode* var) {
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ']'
-    ASTNode* node = new ASTCallArray(var, expr);
-    node->set_line(line);
+    ASTNode* node = new ASTCallArray(line, var, expr);
     return node;
 }
 
@@ -540,8 +531,7 @@ ASTNode* Parser::ParseCallMember(ASTNode* var) {
     if (err_occur_) {
         return nullptr;
     }
-    ASTNode* node = new ASTCallMember(var, member);
-    node->set_line(line);
+    ASTNode* node = new ASTCallMember(line, var, member);
     return node;
 }
 
@@ -576,8 +566,7 @@ ASTNode* Parser::ParseCallFunc(ASTNode* var) {
             }
         }
     }
-    ASTNode* node = new ASTCallFunc(var, parameters);
-    node->set_line(line);
+    ASTNode* node = new ASTCallFunc(line, var, parameters);
     return node;
 }
 
@@ -614,8 +603,7 @@ ASTNode* Parser::ParseExpressionAssignment(ASTNode* var) {
             ERR(cur_token_->line, "expected value after '=' token");
             return nullptr;
         }
-        node = new ASTExprAssign(var, expr);
-        node->set_line(line);
+        node = new ASTExprAssign(line, var, expr);
     }
     return node;
 }
@@ -635,8 +623,7 @@ ASTNode* Parser::ParseDefArray(ASTNode* var) {
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ']'
-    ASTNode* node = new ASTDefArray(var, size);
-    node->set_line(line);
+    ASTNode* node = new ASTDefArray(line, var, size);
     return node;
 }
 
@@ -687,8 +674,7 @@ ASTNode* Parser::ParseDefFunc(ASTNode* var) {
     if (err_occur_) {
         return nullptr;
     }
-    ASTNode* node = new ASTDefFunc(var, parameters, block);
-    node->set_line(line);
+    ASTNode* node = new ASTDefFunc(line, var, parameters, block);
     return node;
 }
 
@@ -702,8 +688,7 @@ ASTNode* Parser::ParseDefClass() {
         return nullptr;
     }
     
-    ASTNode* self = new ASTVariable(cur_token_->value);
-    self->set_line(line);
+    ASTNode* self = new ASTVariable(line, cur_token_->value);
     cur_token_ = tokens_[pos_++];
 
     ASTNode* parent = nullptr;
@@ -713,8 +698,7 @@ ASTNode* Parser::ParseDefClass() {
             ERR(cur_token_->line, "expected parent class name after ':' token");
             return nullptr;
         }
-        parent = new ASTVariable(cur_token_->value);
-        parent->set_line(line);
+        parent = new ASTVariable(line, cur_token_->value);
         cur_token_ = tokens_[pos_++];
     }
 
@@ -729,8 +713,7 @@ ASTNode* Parser::ParseDefClass() {
         return nullptr;
     }
 
-    ASTNode* node = new ASTDefClass(self, parent, block);
-    node->set_line(line);
+    ASTNode* node = new ASTDefClass(line, self, parent, block);
     return node;
 }
 
@@ -743,8 +726,7 @@ ASTNode* Parser::ParseOperatorNew(ASTNode* var) {
         ERR(cur_token_->line, "expected type-specifier after 'new' token");
         return nullptr;
     }
-    ASTNode* class_name = new ASTVariable(cur_token_->value);
-    class_name->set_line(line);
+    ASTNode* class_name = new ASTVariable(line, cur_token_->value);
     cur_token_ = tokens_[pos_++];
     if (static_cast<int>(cur_token_->type) != '(') {
         ERR(cur_token_->line, "expected '(' after type-specifier");
@@ -756,8 +738,7 @@ ASTNode* Parser::ParseOperatorNew(ASTNode* var) {
         return nullptr;
     }
 
-    ASTNode* node = new ASTOperatorNew(var, class_name, func);
-    node->set_line(line);
+    ASTNode* node = new ASTOperatorNew(line, var, class_name, func);
     return node;
 }
 
@@ -770,7 +751,6 @@ ASTNode* Parser::ParseOperatorReturn() {
     if (err_occur_) {
         return nullptr;
     }
-    ASTNode* node = new ASTOperatorReturn(expr);
-    node->set_line(line);
+    ASTNode* node = new ASTOperatorReturn(line, expr);
     return node;
 }
