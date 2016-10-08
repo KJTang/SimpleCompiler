@@ -16,12 +16,12 @@ do { \
     ErrorHandler::GetInstance()->ThrowWarning(line, str); \
 } while (false);
 
-#define IF_NOT_RET(expr) \
-do { \
-    if (!expr) { \
-        return false; \
-    } \
-} while (false);
+// #define IF_NOT_RET(expr) \
+// do { \
+//     if (!expr) { \
+//         return false; \
+//     } \
+// } while (false);
 
 void Analyser::Input(const std::vector<ASTNode*>& input_list) {
     ast_list_ = input_list;
@@ -39,8 +39,13 @@ void Analyser::Output(std::vector<ASTNode*>& output_list) {
 }
 
 bool Analyser::Analysis() {
-    for (int i = 0; i != ast_list_.size(); ++i) {
-        AnalysisNode(ast_list_[i]);
+    for (int i = 0; i != ast_list_.size(); ) {
+        if (!AnalysisNode(ast_list_[i])) {
+            delete ast_list_[i];
+            ast_list_.erase(ast_list_.begin() + i);
+        } else {
+            ++i;
+        }
     }
     return true;
 }
@@ -64,22 +69,22 @@ bool Analyser::AnalysisNode(ASTNode* node) {
             break;
         }
         case ASTTYPE::TYPE_BOOL: {
-            std::cout<<"Analysis: TYPE_BOOL"<<std::endl;
+            std::cout<<"Analysis: TYPE_BOOL\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_INT: {
-            std::cout<<"Analysis: TYPE_INT"<<std::endl;
+            std::cout<<"Analysis: TYPE_INT\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_DOUBLE: {
-            std::cout<<"Analysis: TYPE_DOUBLE"<<std::endl;
+            std::cout<<"Analysis: TYPE_DOUBLE\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_STRING: {
-            std::cout<<"Analysis: TYPE_STRING"<<std::endl;
+            std::cout<<"Analysis: TYPE_STRING\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
@@ -99,7 +104,7 @@ bool Analyser::AnalysisNode(ASTNode* node) {
             break;
         }
         case ASTTYPE::OP_BIN: {
-            std::cout<<"Analysis: OP_BIN "<<(char)(((ASTOperatorBinary*)node)->op_)<<std::endl;
+            std::cout<<"Analysis: OP_BIN\t"<<(char)(((ASTOperatorBinary*)node)->op_)<<std::endl;
             AnalysisOperatorBinary(node);
             break;
         }
@@ -202,9 +207,14 @@ bool Analyser::AnalysisOperatorBinary(ASTNode* op) {
         ASTNode* result = Calculator::GetInstance()->Calculate(op_->get_line(), op_->op_, op_->l_node_, op_->r_node_);
         if (!result) {
             ERR(op_->get_line(), "cannot compute type '" + type_name[op_->l_node_->get_type()] + "' with type '" + type_name[op_->r_node_->get_type()] + "'");
+            return true;
+        }
+        if (op_->parent_) {
+            op_->parent_->ReplaceChild(op_, result);
+        } else {
+            // TODO: delete this node
             return false;
         }
-        op_->parent_->ReplaceChild(op_, result);
     }
     return true;
 }

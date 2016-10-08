@@ -1,22 +1,22 @@
-// a = 1 + 2 * 3.0 / 4 - 5;
-// b = "hello" + " world" + (12-3) + null;
-// c = true || false || 1 > 2;
+1 + 2 * 3.0 / 4 - 5;
+b = "hello" + " world" + (12-3) + null;
+c = true || false || 1 > 2;
 
-factorial = function(num) {
-    if (num == 1) {
-        return 1;
-    }
-    return factorial(num - 1);
-}
+// factorial = function(num) {
+//     if (num == 1) {
+//         return 1;
+//     }
+//     return factorial(num - 1);
+// }
 
-main = function() {
-    num = 0;
-    a = 1 + 2 * 3 / 4 - 5;
-    Input(num);
-    Output(factorial(num));
-}
+// main = function() {
+//     num = 0;
+//     a = 1 + 2 * 3 / 4 - 5;
+//     Input(num);
+//     Output(factorial(num));
+// }
 
-main();
+// main();
 
 // if (a + 1) {
 //     //
