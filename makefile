@@ -7,6 +7,7 @@ SRC =   main.cpp \
 		err_handler.cpp \
 		converter.cpp \
 		calculator.cpp \
+		symbol_table.cpp \
 		astnode.cpp \
 		lexer.cpp \
 		parser.cpp \

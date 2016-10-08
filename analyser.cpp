@@ -3,6 +3,7 @@
 #include "err_handler.h"
 #include "converter.h"
 #include "calculator.h"
+#include "symbol_table.h"
 
 #define ERR(line, str) \
 do { \
@@ -13,6 +14,13 @@ do { \
 #define WARN(line, str) \
 do { \
     ErrorHandler::GetInstance()->ThrowWarning(line, str); \
+} while (false);
+
+#define IF_NOT_RET(expr) \
+do { \
+    if (!expr) { \
+        return false; \
+    } \
 } while (false);
 
 void Analyser::Input(const std::vector<ASTNode*>& input_list) {
@@ -176,6 +184,9 @@ bool Analyser::AnalysisCallMember(ASTNode* mem) {
 
 bool Analyser::AnalysisCallFunc(ASTNode* func) {
     ASTCallFunc* func_ = static_cast<ASTCallFunc*>(func);
+    if (!SymbolTable::GetInstance()->IsExist(func_->var_->get_value())) {
+        ERR(func_->get_line(), "function '" + func_->var_->get_value() + "' is not declared");
+    }
     AnalysisNode(func_->var_);
     for (int i = 0; i != func_->parameters_.size(); ++i) {
         AnalysisNode(func_->parameters_[i]);
@@ -218,8 +229,16 @@ bool Analyser::AnalysisOperatorReturn(ASTNode* op) {
 
 bool Analyser::AnalysisDefArray(ASTNode* def) {
     ASTDefArray* def_ = static_cast<ASTDefArray*>(def);
-    if (def_->var_) {
+    if (!def_->var_) {
+        // TODO: to make things easier, we'll not surpport anonymous array right now
+        ERR(def_->get_line(), "array cannot be anonymous");
+    } else {
         AnalysisNode(def_->var_);
+        if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
+            ERR(def_->get_line(), "redefinition of array '" + def_->var_->get_value() + "'");
+        } else {
+            SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
+        }
     }
     AnalysisNode(def_->size_);
     return true;
@@ -227,8 +246,16 @@ bool Analyser::AnalysisDefArray(ASTNode* def) {
 
 bool Analyser::AnalysisDefFunc(ASTNode* def) {
     ASTDefFunc* def_ = static_cast<ASTDefFunc*>(def);
-    if (def_->var_) {
+    if (!def_->var_) {
+        // TODO: to make things easier, we'll not surpport anonymous function right now
+        ERR(def_->get_line(), "function cannot be anonymous");
+    } else {
         AnalysisNode(def_->var_);
+        if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
+            ERR(def_->get_line(), "redefinition of function '" + def_->var_->get_value() + "'");
+        } else {
+            SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
+        }
     }
     for (int i = 0; i != def_->parameters_.size(); ++i) {
         AnalysisNode(def_->parameters_[i]);

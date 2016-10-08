@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "err_handler.h"
+#include "symbol_table.h"
 #include "lexer.h"
 #include "parser.h"
 #include "analyser.h"
@@ -42,6 +43,7 @@ int main(int argc, char *args[]) {
     analyser.Analysis();
     analyser.Output(analysised_list);
 
+    SymbolTable::GetInstance()->Output();
     ErrorHandler::GetInstance()->Output();
 
     return 0;

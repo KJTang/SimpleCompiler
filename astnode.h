@@ -435,7 +435,7 @@ public:
 
 class ASTDefFunc : public ASTNode {
 private:
-    ASTNode* var_;
+    ASTNode* var_ = nullptr;
     std::vector<ASTNode*> parameters_;
     ASTNode* block_;
 public:
