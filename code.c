@@ -1,6 +1,31 @@
-1 + 2 * 3.0 / 4 - 5;
-b = "hello" + " world" + (12-3) + null;
-c = true || false || 1 > 2;
+var func = function(a) {
+    // var a = 1;
+    a = 0;
+    return true;
+};
+
+var num = 0+1+2+3;
+var str = "hello" + " world";
+
+var func2 = function(a) {
+    func = function(b) {
+        return a + b;
+    }
+    return func;
+}
+
+// func(function(){}, array[1000])
+
+// arr = array[100];
+// arr[0] = 1;
+
+// t = table{};
+// t.arr = arr;
+// t.func = func;
+
+// 1 + 2 * 3.0 / 4 - 5;
+// b = "hello" + " world" + (12-3) + null;
+// c = true || false || 1 > 2;
 
 // factorial = function(num) {
 //     if (num == 1) {

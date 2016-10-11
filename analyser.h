@@ -17,6 +17,7 @@ static std::map<ASTTYPE, std::string> type_name = {
 class Analyser {
 private:
     std::vector<ASTNode*> ast_list_;
+    int level = 0;
 
     bool err_occur_ = false;
 
@@ -30,6 +31,7 @@ private:
     bool AnalysisOperatorBinary(ASTNode* op);
     bool AnalysisOperatorNew(ASTNode* op);
     bool AnalysisOperatorReturn(ASTNode* op);
+    bool AnalysisDecVar(ASTNode* dec);
     bool AnalysisDefArray(ASTNode* def);
     bool AnalysisDefFunc(ASTNode* def);
     bool AnalysisDefClass(ASTNode* def);

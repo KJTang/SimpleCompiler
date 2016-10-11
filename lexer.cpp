@@ -186,9 +186,18 @@ Token Lexer::LexIdentifier() {
     } else if (identifier_name == "while") {
         tokens_.push_back(new TokenStruct(Token::KEYWORD_WHILE, identifier_name, line_));
         return Token::KEYWORD_WHILE;
+    } else if (identifier_name == "var") {
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_VAR, identifier_name, line_));
+        return Token::KEYWORD_VAR;
+    } else if (identifier_name == "array") {
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_ARRAY, identifier_name, line_));
+        return Token::KEYWORD_ARRAY;
     } else if (identifier_name == "function") {
         tokens_.push_back(new TokenStruct(Token::KEYWORD_FUNCTION, identifier_name, line_));
         return Token::KEYWORD_FUNCTION;
+    } else if (identifier_name == "table") {
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_TABLE, identifier_name, line_));
+        return Token::KEYWORD_TABLE;
     } else if (identifier_name == "return") {
         tokens_.push_back(new TokenStruct(Token::KEYWORD_RET, identifier_name, line_));
         return Token::KEYWORD_RET;

@@ -49,12 +49,17 @@ private:
 
     ASTNode* ParseConst();
     ASTNode* ParseVariable();
+
     ASTNode* ParseCallArray(ASTNode* var);
     ASTNode* ParseCallMember(ASTNode* var);
     ASTNode* ParseCallFunc(ASTNode* var);
-    ASTNode* ParseDefArray(ASTNode* var);
-    ASTNode* ParseDefFunc(ASTNode* var);
-    ASTNode* ParseDefClass();
+
+    ASTNode* ParseDeclareVar();
+
+    ASTNode* ParseDefArray();
+    ASTNode* ParseDefFunc();
+    ASTNode* ParseDefTable();
+    // ASTNode* ParseDefClass();
 
     ASTNode* ParseOperatorNew(ASTNode* var);
     ASTNode* ParseOperatorReturn();

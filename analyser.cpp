@@ -118,6 +118,11 @@ bool Analyser::AnalysisNode(ASTNode* node) {
             AnalysisOperatorReturn(node);
             break;
         }
+        case ASTTYPE::DEC_VAR: {
+            std::cout<<"Analysis: DEC_VAR"<<std::endl;
+            AnalysisDecVar(node);
+            break;
+        }
         case ASTTYPE::DEF_ARR: {
             std::cout<<"Analysis: DEF_ARR"<<std::endl;
             AnalysisDefArray(node);
@@ -153,13 +158,30 @@ bool Analyser::AnalysisNode(ASTNode* node) {
             break;
         }
     }
+    return true;
 }
 
 bool Analyser::AnalysisBlock(ASTNode* block) {
+    ++level;
+    SymbolTable::GetInstance()->PushTable();
     ASTBlock* block_ = static_cast<ASTBlock*>(block);
+    // if it's a function block
+    if (block_->parent_->get_type() == ASTTYPE::DEF_FUNC) {
+        ASTDefFunc* func = static_cast<ASTDefFunc*>(block_->parent_);
+        for (int i = 0; i != func->parameters_.size(); ++i) {
+            SymbolTable::GetInstance()->InsertInLevel(func->parameters_[i]->get_value(), level);
+        }
+    }
+    // TODO:
+    // if it's a table block
+    // if it's a if block
+    // if it's a while block
+
     for (int i = 0; i != block_->statements_.size(); ++i) {
         AnalysisNode(block_->statements_[i]);
     }
+    --level;
+    SymbolTable::GetInstance()->PopTable();
     return true;
 }
 
@@ -170,6 +192,12 @@ bool Analyser::AnalysisConst(ASTNode* con) {
 
 bool Analyser::AnalysisVariable(ASTNode* var) {
     ASTVariable* var_ = static_cast<ASTVariable*>(var);
+    if (var_->parent_ == nullptr || 
+        var_->parent_->get_type() != ASTTYPE::DEF_FUNC) {
+        if (SymbolTable::GetInstance()->Find(var_->get_value()) == nullptr) {
+            ERR(var_->get_line(), "undefined variable '" + var_->get_value() + "'");
+        }
+    }
     return true;
 }
 
@@ -237,6 +265,28 @@ bool Analyser::AnalysisOperatorReturn(ASTNode* op) {
     return true;
 }
 
+bool Analyser::AnalysisDecVar(ASTNode* dec) {
+    ASTDecVar* dec_ = static_cast<ASTDecVar*>(dec);
+    for (int i = 0; i != dec_->var_list_.size(); ++i) {
+        std::string name;
+        // var
+        if (dec_->var_list_[i]->get_type() == ASTTYPE::VARIABLE) {
+            name = dec_->var_list_[i]->get_value();
+        }
+        // assign
+        else {
+            name = static_cast<ASTExprAssign*>(dec_->var_list_[i])->l_node_->get_value();
+        }
+        if (SymbolTable::GetInstance()->FindInLevel(name, level) != nullptr) {
+            ERR(dec_->get_line(), "redeclaration of var '" + name + "'");
+        } else {
+            SymbolTable::GetInstance()->InsertInLevel(name, level);
+        }
+        AnalysisNode(dec_->var_list_[i]);
+    }
+    return true;
+}
+
 bool Analyser::AnalysisDefArray(ASTNode* def) {
     ASTDefArray* def_ = static_cast<ASTDefArray*>(def);
     if (!def_->var_) {
@@ -244,11 +294,11 @@ bool Analyser::AnalysisDefArray(ASTNode* def) {
         ERR(def_->get_line(), "array cannot be anonymous");
     } else {
         AnalysisNode(def_->var_);
-        if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
-            ERR(def_->get_line(), "redefinition of array '" + def_->var_->get_value() + "'");
-        } else {
-            SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
-        }
+        // if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
+        //     ERR(def_->get_line(), "redefinition of array '" + def_->var_->get_value() + "'");
+        // } else {
+        //     SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
+        // }
     }
     AnalysisNode(def_->size_);
     return true;
@@ -261,11 +311,11 @@ bool Analyser::AnalysisDefFunc(ASTNode* def) {
         ERR(def_->get_line(), "function cannot be anonymous");
     } else {
         AnalysisNode(def_->var_);
-        if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
-            ERR(def_->get_line(), "redefinition of function '" + def_->var_->get_value() + "'");
-        } else {
-            SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
-        }
+        // if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
+        //     ERR(def_->get_line(), "redefinition of function '" + def_->var_->get_value() + "'");
+        // } else {
+        //     SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
+        // }
     }
     for (int i = 0; i != def_->parameters_.size(); ++i) {
         AnalysisNode(def_->parameters_[i]);
