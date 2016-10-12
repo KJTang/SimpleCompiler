@@ -186,6 +186,9 @@ Token Lexer::LexIdentifier() {
     } else if (identifier_name == "while") {
         tokens_.push_back(new TokenStruct(Token::KEYWORD_WHILE, identifier_name, line_));
         return Token::KEYWORD_WHILE;
+    } else if (identifier_name == "break") {
+        tokens_.push_back(new TokenStruct(Token::KEYWORD_BREAK, identifier_name, line_));
+        return Token::KEYWORD_BREAK;
     } else if (identifier_name == "var") {
         tokens_.push_back(new TokenStruct(Token::KEYWORD_VAR, identifier_name, line_));
         return Token::KEYWORD_VAR;

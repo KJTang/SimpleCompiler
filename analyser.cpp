@@ -118,6 +118,11 @@ bool Analyser::AnalysisNode(ASTNode* node) {
             AnalysisOperatorReturn(node);
             break;
         }
+        case ASTTYPE::OP_BREAK: {
+            std::cout<<"Analysis: OP_BREAK"<<std::endl;
+            AnalysisOperatorBreak(node);
+            break;
+        }
         case ASTTYPE::DEC_VAR: {
             std::cout<<"Analysis: DEC_VAR"<<std::endl;
             AnalysisDecVar(node);
@@ -133,11 +138,16 @@ bool Analyser::AnalysisNode(ASTNode* node) {
             AnalysisDefFunc(node);
             break;
         }
-        case ASTTYPE::DEF_CLASS: {
-            std::cout<<"Analysis: DEF_CLASS"<<std::endl;
-            AnalysisDefClass(node);
+        case ASTTYPE::DEF_TABLE: {
+            std::cout<<"Analysis: DEF_TABLE"<<std::endl;
+            AnalysisDefTable(node);
             break;
         }
+        // case ASTTYPE::DEF_CLASS: {
+        //     std::cout<<"Analysis: DEF_CLASS"<<std::endl;
+        //     AnalysisDefClass(node);
+        //     break;
+        // }
         case ASTTYPE::EXPR_ASSIGN: {
             std::cout<<"Analysis: EXPR_ASSIGN"<<std::endl;
             AnalysisExprAssign(node);
@@ -193,7 +203,7 @@ bool Analyser::AnalysisConst(ASTNode* con) {
 bool Analyser::AnalysisVariable(ASTNode* var) {
     ASTVariable* var_ = static_cast<ASTVariable*>(var);
     if (var_->parent_ == nullptr || 
-        var_->parent_->get_type() != ASTTYPE::DEF_FUNC) {
+        (var_->parent_->get_type() != ASTTYPE::DEF_FUNC && var_->parent_->get_type() != ASTTYPE::CALL_MEMBER)) {
         if (SymbolTable::GetInstance()->Find(var_->get_value()) == nullptr) {
             ERR(var_->get_line(), "undefined variable '" + var_->get_value() + "'");
         }
@@ -265,6 +275,23 @@ bool Analyser::AnalysisOperatorReturn(ASTNode* op) {
     return true;
 }
 
+bool Analyser::AnalysisOperatorBreak(ASTNode* op) {
+    // ASTOperatorBreak* op_ = static_cast<ASTOperatorBreak*>(op);
+    bool flag = false;
+    ASTNode* node = op;
+    while (node->parent_) {
+        node = node->parent_;
+        if (node->get_type() == ASTTYPE::EXPR_WHILE) {
+            flag = true;
+            break;
+        }
+    }
+    if (!flag) {
+        ERR(op->get_line(), "'break' can only used in loop");
+    }
+    return true;
+}
+
 bool Analyser::AnalysisDecVar(ASTNode* dec) {
     ASTDecVar* dec_ = static_cast<ASTDecVar*>(dec);
     for (int i = 0; i != dec_->var_list_.size(); ++i) {
@@ -289,34 +316,12 @@ bool Analyser::AnalysisDecVar(ASTNode* dec) {
 
 bool Analyser::AnalysisDefArray(ASTNode* def) {
     ASTDefArray* def_ = static_cast<ASTDefArray*>(def);
-    if (!def_->var_) {
-        // TODO: to make things easier, we'll not surpport anonymous array right now
-        ERR(def_->get_line(), "array cannot be anonymous");
-    } else {
-        AnalysisNode(def_->var_);
-        // if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
-        //     ERR(def_->get_line(), "redefinition of array '" + def_->var_->get_value() + "'");
-        // } else {
-        //     SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
-        // }
-    }
     AnalysisNode(def_->size_);
     return true;
 }
 
 bool Analyser::AnalysisDefFunc(ASTNode* def) {
     ASTDefFunc* def_ = static_cast<ASTDefFunc*>(def);
-    if (!def_->var_) {
-        // TODO: to make things easier, we'll not surpport anonymous function right now
-        ERR(def_->get_line(), "function cannot be anonymous");
-    } else {
-        AnalysisNode(def_->var_);
-        // if (SymbolTable::GetInstance()->IsExist(def_->var_->get_value())) {
-        //     ERR(def_->get_line(), "redefinition of function '" + def_->var_->get_value() + "'");
-        // } else {
-        //     SymbolTable::GetInstance()->Insert(def_->var_->get_value(), SymbolType::VAR, def_);
-        // }
-    }
     for (int i = 0; i != def_->parameters_.size(); ++i) {
         AnalysisNode(def_->parameters_[i]);
     }
@@ -324,15 +329,20 @@ bool Analyser::AnalysisDefFunc(ASTNode* def) {
     return true;
 }
 
-bool Analyser::AnalysisDefClass(ASTNode* def) {
-    ASTDefClass* def_ = static_cast<ASTDefClass*>(def);
-    AnalysisNode(def_->self_);
-    if (def_->base_) {
-        AnalysisNode(def_->base_);
-    }
-    AnalysisNode(def_->block_);
+bool Analyser::AnalysisDefTable(ASTNode* def) {
+    ASTDefFunc* def_ = static_cast<ASTDefFunc*>(def);
     return true;
 }
+
+// bool Analyser::AnalysisDefClass(ASTNode* def) {
+//     ASTDefClass* def_ = static_cast<ASTDefClass*>(def);
+//     AnalysisNode(def_->self_);
+//     if (def_->base_) {
+//         AnalysisNode(def_->base_);
+//     }
+//     AnalysisNode(def_->block_);
+//     return true;
+// }
 
 bool Analyser::AnalysisExprAssign(ASTNode* expr) {
     ASTExprAssign* expr_ = static_cast<ASTExprAssign*>(expr);

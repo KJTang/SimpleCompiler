@@ -20,6 +20,7 @@ enum class ASTTYPE {
     OP_BIN,
     OP_NEW,
     OP_RET,
+    OP_BREAK,
     DEC_VAR, 
     DEF_ARR,
     DEF_FUNC,
@@ -392,6 +393,22 @@ public:
     }
 };
 
+class ASTOperatorBreak : public ASTNode {
+private:
+public:
+    ASTOperatorBreak(int line) {
+        set_line(line);
+        set_type(ASTTYPE::OP_BREAK);
+    }
+    ~ASTOperatorBreak() {}
+
+    friend class Analyser;
+    // Test
+    virtual void Print() {
+        std::cout<<"ASTOperatorBreak: \t"<<"break"<<std::endl;
+    }
+};
+
 class ASTDecVar : public ASTNode {
 private:
     std::vector<ASTNode*> var_list_;
@@ -431,29 +448,19 @@ public:
 
 class ASTDefArray : public ASTNode {
 private:
-    ASTNode* var_;
     ASTNode* size_;
 public:
-    ASTDefArray(int line, ASTNode* var, ASTNode* size) : var_(var), size_(size) {
+    ASTDefArray(int line, ASTNode* size) : size_(size) {
         set_line(line);
         set_type(ASTTYPE::DEF_ARR);
-        if (var_) {
-            var_->set_parent(this);
-        }
         size_->set_parent(this);
     }
     ~ASTDefArray() {
-        if (var_) {
-            delete var_;
-        }
         delete size_;
     }
 
     virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
-        if (cur_child == var_) {
-            var_ = new_child;
-            delete cur_child;
-        } else if (cur_child == size_) {
+        if (cur_child == size_) {
             size_ = new_child;
             delete cur_child;
         }
@@ -463,36 +470,24 @@ public:
     // Test
     virtual void Print() {
         std::cout<<"ASTDefArray: \t"<<"def []"<<std::endl;
-        if (var_) {
-            var_->Print();
-        } else {
-            std::cout<<"ASTDefArray: \tAnonymous"<<std::endl;
-        }
         size_->Print();
     }  
 };
 
 class ASTDefFunc : public ASTNode {
 private:
-    ASTNode* var_ = nullptr;
     std::vector<ASTNode*> parameters_;
     ASTNode* block_;
 public:
-    ASTDefFunc(int line, ASTNode* var, const std::vector<ASTNode*>& parameters, ASTNode* block) : var_(var), parameters_(parameters), block_(block) {
+    ASTDefFunc(int line, const std::vector<ASTNode*>& parameters, ASTNode* block) : parameters_(parameters), block_(block) {
         set_line(line);
         set_type(ASTTYPE::DEF_FUNC);
-        if (var_) {
-            var_->set_parent(this);
-        }
         for (int i = 0; i != parameters_.size(); ++i) {
             parameters_[i]->set_parent(this);
         }
         block_->set_parent(this);
     }
     ~ASTDefFunc() {
-        if (var_) {
-            delete var_;
-        }
         for (int i = 0; i != parameters_.size(); ++i) {
             delete parameters_[i];
         }
@@ -500,10 +495,7 @@ public:
     }
 
     virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
-        if (cur_child == var_) {
-            var_ = new_child;
-            delete cur_child;
-        } else if (cur_child == block_) {
+        if (cur_child == block_) {
             block_ = new_child;
             delete cur_child;
         } else {
@@ -521,11 +513,6 @@ public:
     // Test
     virtual void Print() {
         std::cout<<"ASTDefFunc: \t"<<"def ("<<parameters_.size()<<")"<<std::endl;
-        if (var_) {
-            var_->Print();
-        } else {
-            std::cout<<"ASTDefFunc: \tAnonymous"<<std::endl;
-        }
         for (int i = 0; i != parameters_.size(); ++i) {
             parameters_[i]->Print();
         }
@@ -535,37 +522,17 @@ public:
 
 class ASTDefTable : public ASTNode {
 private:
-    ASTNode* var_ = nullptr;
 public:
-    ASTDefTable(int line, ASTNode* var) : var_(var) {
+    ASTDefTable(int line) {
         set_line(line);
         set_type(ASTTYPE::DEF_TABLE);
-        if (var_) {
-            var_->set_parent(this);
-        }
     }
-    ~ASTDefTable() {
-        if (var_) {
-            delete var_;
-        }
-    }
-
-    virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {
-        if (cur_child == var_) {
-            var_ = new_child;
-            delete cur_child;
-        }
-    }
+    ~ASTDefTable() {}
 
     friend class Analyser;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefTable: \t"<<"def table"<<std::endl;
-        if (var_) {
-            var_->Print();
-        } else {
-            std::cout<<"ASTDefTable: \tAnonymous"<<std::endl;
-        }
     }
 };
 

@@ -63,6 +63,9 @@ ASTNode* Parser::ParseStatement() {
         case Token::KEYWORD_WHILE: {
             return ParseExpressionWhile();
         }
+        case Token::KEYWORD_BREAK: {
+            return ParseOperatorBreak();
+        }
         case Token::KEYWORD_VAR: {
             return ParseDeclareVar();
         }
@@ -662,7 +665,7 @@ ASTNode* Parser::ParseDefArray() {
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat ']'
-    ASTNode* node = new ASTDefArray(line, nullptr, size);
+    ASTNode* node = new ASTDefArray(line, size);
     return node;
 }
 
@@ -713,7 +716,7 @@ ASTNode* Parser::ParseDefFunc() {
     if (err_occur_) {
         return nullptr;
     }
-    ASTNode* node = new ASTDefFunc(line, nullptr, parameters, block);
+    ASTNode* node = new ASTDefFunc(line, parameters, block);
     return node;
 }
 
@@ -732,7 +735,7 @@ ASTNode* Parser::ParseDefTable() {
         return nullptr;
     }
     cur_token_ = tokens_[pos_++];   // eat "}"
-    ASTNode* node = new ASTDefTable(line, nullptr);
+    ASTNode* node = new ASTDefTable(line);
     return node;
 }
 
@@ -810,5 +813,14 @@ ASTNode* Parser::ParseOperatorReturn() {
         return nullptr;
     }
     ASTNode* node = new ASTOperatorReturn(line, expr);
+    return node;
+}
+
+ASTNode* Parser::ParseOperatorBreak() {
+    // std::cout<<"ParseOperatorBreak: "<<cur_token_->value<<std::endl;
+
+    int line = cur_token_->line;
+    cur_token_ = tokens_[pos_++];   // eat "break"
+    ASTNode* node = new ASTOperatorBreak(line);
     return node;
 }

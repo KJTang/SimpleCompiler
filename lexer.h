@@ -26,7 +26,8 @@ enum class Token : int {
     KEYWORD_IF,         // if
     KEYWORD_ELSE,       // else
     KEYWORD_WHILE,      // while
-    KEYWORD_VAR,      // var
+    KEYWORD_BREAK,      // break
+    KEYWORD_VAR,        // var
     KEYWORD_ARRAY,      // array
     KEYWORD_FUNCTION,   // funtion
     KEYWORD_TABLE,      // table

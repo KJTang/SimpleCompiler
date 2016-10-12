@@ -63,6 +63,7 @@ private:
 
     ASTNode* ParseOperatorNew(ASTNode* var);
     ASTNode* ParseOperatorReturn();
+    ASTNode* ParseOperatorBreak();
 public:
     Parser();
     ~Parser();
