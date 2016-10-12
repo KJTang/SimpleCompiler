@@ -6,15 +6,8 @@
 
 #include "astnode.h"
 
-enum class SymbolType {
-    VAR, 
-    CLASS,
-};
-
 struct SymbolElement {
     std::string name;
-    // SymbolType type;
-    // ASTNode* astnode;
 };
 
 class SymbolTable {
@@ -26,7 +19,9 @@ private:
 public:
     SymbolTable() {}
     ~SymbolTable() {
-        // TODO: release memory
+        for (int i = 0; i != table_list_.size(); ++i) {
+            delete table_list_[i];
+        }
     }
     
     static SymbolTable* GetInstance() {
@@ -37,13 +32,11 @@ public:
         return shared_ptr_;
     }
 
-    // bool InsertInLevel(const std::string& name, SymbolType type, ASTNode* astnode, int level);
     bool InsertInLevel(const std::string& name, int level);
     bool DeleteInLevel(const std::string& name, int level);
     SymbolElement* FindInLevel(const std::string& name, int level);
     bool IsExistInLevel(const std::string& name, int level);
 
-    // bool Insert(const std::string& name, SymbolType type, ASTNode* astnode);
     bool Insert(const std::string& name);
     bool Delete(const std::string& name);
     SymbolElement* Find(const std::string& name);

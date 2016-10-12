@@ -2,23 +2,6 @@
 
 SymbolTable* SymbolTable::shared_ptr_ = nullptr;
 
-// bool SymbolTable::InsertInLevel(const std::string& name, SymbolType type, ASTNode* astnode, int level = 0) {
-//     if (level > top_) {
-//         return false;
-//     }
-//     SymbolElement* elem = FindInLevel(name, level);
-//     if (elem) {
-//         return false;
-//     }
-//     elem = new SymbolElement();
-//     elem->name = name;
-//     elem->type = type;
-//     elem->astnode = astnode;
-
-//     table_list_[level]->insert(std::make_pair(name, elem));
-//     return true;
-// }
-
 bool SymbolTable::InsertInLevel(const std::string& name, int level = 0) {
     if (level > top_) {
         return false;
@@ -29,8 +12,6 @@ bool SymbolTable::InsertInLevel(const std::string& name, int level = 0) {
     }
     elem = new SymbolElement();
     elem->name = name;
-    // elem->type = type;
-    // elem->astnode = astnode;
 
     table_list_[level]->insert(std::make_pair(name, elem));
     return true;
@@ -66,17 +47,22 @@ bool SymbolTable::IsExistInLevel(const std::string& name, int level = 0) {
     return FindInLevel(name, level) == nullptr ? false : true;
 }
 
-// bool SymbolTable::Insert(const std::string& name, SymbolType type, ASTNode* astnode) {
-//     return InsertInLevel(name, type, astnode, top_);
-// }
-
 bool SymbolTable::Insert(const std::string& name) {
     return InsertInLevel(name, top_);
 }
 
 bool SymbolTable::Delete(const std::string& name) {
-    // TODO
-    return true;
+    int level = top_;
+    while (level >= 0) {
+        SymbolElement* elem = FindInLevel(name, level);
+        if (elem) {
+            delete elem;
+            table_list_[level]->erase(name);
+            return true;
+        }
+        --level;
+    }
+    return false;
 }
 
 SymbolElement* SymbolTable::Find(const std::string& name) {
@@ -120,7 +106,6 @@ void SymbolTable::Output() {
         std::cout<<"Level "<<i<<std::endl;
         for (auto it = table_list_[i]->begin(); it != table_list_[i]->end(); ++it) {
             std::cout<<"Name: "<<it->first<<std::endl;
-            // std::cout<<"Name: "<<it->first<<"\tValue: "<<it->second->astnode->get_value()<<std::endl;
         }
     }
     std::cout<<"======================== SymbolTable ===================="<<std::endl;
