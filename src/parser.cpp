@@ -385,7 +385,7 @@ ASTNode* Parser::ParseExpression() {
                 }
                 is_token_var = false;
 
-                if (!op_stack.empty() && 
+                while (!op_stack.empty() && 
                     binary_operator_precedence[op_stack.top()] >= binary_operator_precedence[static_cast<int>(cur_token_->type)]) {
                     int op = op_stack.top();
                     op_stack.pop();

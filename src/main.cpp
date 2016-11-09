@@ -45,11 +45,11 @@ int main(int argc, char *args[]) {
     analyser.Analysis();
     analyser.Output(analysised_list);
 
-    generator.Input(analysised_list);
-    generator.Generate();
-    generator.Output(output_str);
+    // generator.Input(analysised_list);
+    // generator.Generate();
+    // generator.Output(output_str);
 
-    SymbolTable::GetInstance()->Output();
+    // SymbolTable::GetInstance()->Output();
     ErrorHandler::GetInstance()->Output();
 
     return 0;
