@@ -1,0 +1,38 @@
+
+const = bool | int | double | string
+
+variable = identifier | ( variable, [ call-array | call-member | call-func ] )
+
+call-array = "[", expression, "]"
+
+call-member = ".", variable
+
+call-func = "(", { expression, { ",", expression } }, ")"
+
+def-array = "[", int | expression, "]"
+
+def-function = "function", "(", { variable, {",", variable} }  , ")", block
+
+def-class = "class", identifier, [ ":", identifier ], block
+
+operator-binary = "+" | "-" | "*" | "/"
+
+operator-return = "return", [ expression ]
+
+operator-new = "new", identifier, "(", { variable, {",", variable} }  , ")"
+
+expression = variable | expr-paren | expr-assign | def-function | def-array | const, { operator-binary, variable | expr-paren | expr-assign | def-function | def-array | const }
+
+expr-if = "if", expr-paren, block | statement, { "else", block | statement }
+
+expr-while = "while", expr-paren, block | statement
+
+expr-paren = "(", expression, ")"
+
+expr-assign = expression, "=", expression | def-function | def-array
+
+statement = expression | expr-if | expr-while | ";"
+
+block = "{", { statement }, "}"
+
+program = { statement }

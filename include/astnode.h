@@ -60,6 +60,7 @@ public:
     virtual void ReplaceChild(ASTNode* cur_child, ASTNode* new_child) {}
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {}
 };
@@ -92,6 +93,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTBlock: \t"<<"{"<<statements_.size()<<"}"<<std::endl;
@@ -133,6 +135,7 @@ public:
     ~ASTConst() {}
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTConst: \t"<<get_value()<<std::endl;
@@ -149,6 +152,7 @@ public:
     ~ASTVariable() {}
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTVariable: \t"<<get_value()<<std::endl;
@@ -182,6 +186,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTCallArray: \t"<<"[]"<<std::endl;
@@ -217,6 +222,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTCallMember: \t"<<"."<<std::endl;
@@ -261,6 +267,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTCallFunc: \t"<<"("<<parameters_.size()<<")"<<std::endl;
@@ -299,6 +306,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorBinary: \t"<<(char)op_<<"("<<op_<<")"<<std::endl;
@@ -344,6 +352,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorNew: \t"<<"new class"<<std::endl;
@@ -382,6 +391,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorReturn: \t"<<"return"<<std::endl;
@@ -403,6 +413,7 @@ public:
     ~ASTOperatorBreak() {}
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTOperatorBreak: \t"<<"break"<<std::endl;
@@ -437,6 +448,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTDecVar: \t"<<var_list_.size()<<std::endl;
@@ -467,6 +479,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefArray: \t"<<"def []"<<std::endl;
@@ -510,6 +523,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefFunc: \t"<<"def ("<<parameters_.size()<<")"<<std::endl;
@@ -530,6 +544,7 @@ public:
     ~ASTDefTable() {}
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefTable: \t"<<"def table"<<std::endl;
@@ -573,6 +588,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTDefClass: \t"<<"def class"<<std::endl;
@@ -611,6 +627,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTExprAssign: \t"<<"="<<std::endl;
@@ -656,6 +673,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTExprIf: \t"<<"if"<<std::endl;
@@ -694,6 +712,7 @@ public:
     }
 
     friend class Analyser;
+    friend class Generator;
     // Test
     virtual void Print() {
         std::cout<<"ASTExprWhile: \t"<<"while"<<std::endl;

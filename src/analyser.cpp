@@ -54,117 +54,117 @@ bool Analyser::AnalysisNode(ASTNode* node) {
     // std::cout<<"node: "<<(int)node->get_type()<<std::endl;
     switch (node->get_type()) {
         case ASTTYPE::BLOCK: {
-            std::cout<<"Analysis: BLOCK"<<std::endl;
+            // std::cout<<"Analysis: BLOCK"<<std::endl;
             AnalysisBlock(node);
             break;
         }
         case ASTTYPE::VARIABLE: {
             AnalysisVariable(node);
-            std::cout<<"Analysis: VARIABLE"<<std::endl;
+            // std::cout<<"Analysis: VARIABLE"<<std::endl;
             break;
         }
         case ASTTYPE::TYPE_NULL: {
-            std::cout<<"Analysis: TYPE_NULL"<<std::endl;
+            // std::cout<<"Analysis: TYPE_NULL"<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_BOOL: {
-            std::cout<<"Analysis: TYPE_BOOL\t"<<node->get_value()<<std::endl;
+            // std::cout<<"Analysis: TYPE_BOOL\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_INT: {
-            std::cout<<"Analysis: TYPE_INT\t"<<node->get_value()<<std::endl;
+            // std::cout<<"Analysis: TYPE_INT\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_DOUBLE: {
-            std::cout<<"Analysis: TYPE_DOUBLE\t"<<node->get_value()<<std::endl;
+            // std::cout<<"Analysis: TYPE_DOUBLE\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::TYPE_STRING: {
-            std::cout<<"Analysis: TYPE_STRING\t"<<node->get_value()<<std::endl;
+            // std::cout<<"Analysis: TYPE_STRING\t"<<node->get_value()<<std::endl;
             AnalysisConst(node);
             break;
         }
         case ASTTYPE::CALL_ARR: {
-            std::cout<<"Analysis: CALL_ARR"<<std::endl;
+            // std::cout<<"Analysis: CALL_ARR"<<std::endl;
             AnalysisCallArray(node);
             break;
         }
         case ASTTYPE::CALL_MEMBER: {
-            std::cout<<"Analysis: CALL_MEMBER"<<std::endl;
+            // std::cout<<"Analysis: CALL_MEMBER"<<std::endl;
             AnalysisCallMember(node);
             break;
         }
         case ASTTYPE::CALL_FUNC: {
-            std::cout<<"Analysis: CALL_FUNC"<<std::endl;
+            // std::cout<<"Analysis: CALL_FUNC"<<std::endl;
             AnalysisCallFunc(node);
             break;
         }
         case ASTTYPE::OP_BIN: {
-            std::cout<<"Analysis: OP_BIN\t"<<(char)(((ASTOperatorBinary*)node)->op_)<<std::endl;
+            // std::cout<<"Analysis: OP_BIN\t"<<(char)(((ASTOperatorBinary*)node)->op_)<<std::endl;
             AnalysisOperatorBinary(node);
             break;
         }
         case ASTTYPE::OP_NEW: {
-            std::cout<<"Analysis: OP_NEW"<<std::endl;
+            // std::cout<<"Analysis: OP_NEW"<<std::endl;
             AnalysisOperatorNew(node);
             break;
         }
         case ASTTYPE::OP_RET: {
-            std::cout<<"Analysis: OP_RET"<<std::endl;
+            // std::cout<<"Analysis: OP_RET"<<std::endl;
             AnalysisOperatorReturn(node);
             break;
         }
         case ASTTYPE::OP_BREAK: {
-            std::cout<<"Analysis: OP_BREAK"<<std::endl;
+            // std::cout<<"Analysis: OP_BREAK"<<std::endl;
             AnalysisOperatorBreak(node);
             break;
         }
         case ASTTYPE::DEC_VAR: {
-            std::cout<<"Analysis: DEC_VAR"<<std::endl;
+            // std::cout<<"Analysis: DEC_VAR"<<std::endl;
             AnalysisDecVar(node);
             break;
         }
         case ASTTYPE::DEF_ARR: {
-            std::cout<<"Analysis: DEF_ARR"<<std::endl;
+            // std::cout<<"Analysis: DEF_ARR"<<std::endl;
             AnalysisDefArray(node);
             break;
         }
         case ASTTYPE::DEF_FUNC: {
-            std::cout<<"Analysis: DEF_FUNC"<<std::endl;
+            // std::cout<<"Analysis: DEF_FUNC"<<std::endl;
             AnalysisDefFunc(node);
             break;
         }
         case ASTTYPE::DEF_TABLE: {
-            std::cout<<"Analysis: DEF_TABLE"<<std::endl;
+            // std::cout<<"Analysis: DEF_TABLE"<<std::endl;
             AnalysisDefTable(node);
             break;
         }
         // case ASTTYPE::DEF_CLASS: {
-        //     std::cout<<"Analysis: DEF_CLASS"<<std::endl;
+            // std::cout<<"Analysis: DEF_CLASS"<<std::endl;
         //     AnalysisDefClass(node);
         //     break;
         // }
         case ASTTYPE::EXPR_ASSIGN: {
-            std::cout<<"Analysis: EXPR_ASSIGN"<<std::endl;
+            // std::cout<<"Analysis: EXPR_ASSIGN"<<std::endl;
             AnalysisExprAssign(node);
             break;
         }
         case ASTTYPE::EXPR_IF: {
-            std::cout<<"Analysis: EXPR_IF"<<std::endl;
+            // std::cout<<"Analysis: EXPR_IF"<<std::endl;
             AnalysisExprIf(node);
             break;
         }
         case ASTTYPE::EXPR_WHILE: {
-            std::cout<<"Analysis: EXPR_WHILE"<<std::endl;
+            // std::cout<<"Analysis: EXPR_WHILE"<<std::endl;
             AnalysisExprWhile(node);
             break;
         }
         default: {
-            std::cout<<"========================================"<<std::endl;
+            // std::cout<<"========================================"<<std::endl;
             break;
         }
     }
@@ -202,10 +202,28 @@ bool Analyser::AnalysisConst(ASTNode* con) {
 
 bool Analyser::AnalysisVariable(ASTNode* var) {
     ASTVariable* var_ = static_cast<ASTVariable*>(var);
-    if (var_->parent_ == nullptr || 
-        (var_->parent_->get_type() != ASTTYPE::DEF_FUNC && var_->parent_->get_type() != ASTTYPE::CALL_MEMBER)) {
+    if (var_->parent_ == nullptr) {
         if (SymbolTable::GetInstance()->Find(var_->get_value()) == nullptr) {
             ERR(var_->get_line(), "undefined variable '" + var_->get_value() + "'");
+        }
+    } else {
+        switch (var_->parent_->get_type()) {
+            case ASTTYPE::DEF_FUNC: {
+                //
+                break;
+            }
+            case ASTTYPE::CALL_MEMBER: {
+                if (SymbolTable::GetInstance()->FindInLevel(var_->get_value(), level) == nullptr) {
+                    SymbolTable::GetInstance()->InsertInLevel(var_->get_value(), level);
+                }
+                break;
+            }
+            default: {
+                if (SymbolTable::GetInstance()->Find(var_->get_value()) == nullptr) {
+                    ERR(var_->get_line(), "undefined variable '" + var_->get_value() + "'");
+                }
+                break;
+            }
         }
     }
     return true;
@@ -227,8 +245,10 @@ bool Analyser::AnalysisCallMember(ASTNode* mem) {
 
 bool Analyser::AnalysisCallFunc(ASTNode* func) {
     ASTCallFunc* func_ = static_cast<ASTCallFunc*>(func);
-    if (!SymbolTable::GetInstance()->IsExist(func_->var_->get_value())) {
-        ERR(func_->get_line(), "function '" + func_->var_->get_value() + "' is not declared");
+    if (func_->var_->get_type() == ASTTYPE::VARIABLE) {
+        if (!SymbolTable::GetInstance()->IsExist(func_->var_->get_value())) {
+            ERR(func_->get_line(), "function '" + func_->var_->get_value() + "' is not declared");
+        }
     }
     AnalysisNode(func_->var_);
     for (int i = 0; i != func_->parameters_.size(); ++i) {
